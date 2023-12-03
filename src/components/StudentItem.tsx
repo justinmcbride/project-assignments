@@ -3,23 +3,26 @@ import { useDrag } from 'react-dnd'
 
 import { ItemTypes } from './ItemTypes'
 import { Chip } from '@mui/joy'
+import Student from "@/types/Student"
 
 interface Props {
-  name: string
+  student: Student;
+  onAddToRole: (student: Student, role: string) => void;
 }
 
 interface DropResult {
   name: string
 }
 
-export const StudentItem: FC<Props> = ({ name }) => {
+export const StudentItem: FC<Props> = ({ student, onAddToRole }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.BOX,
-    item: { name },
+    item: student,
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult<DropResult>()
       if (item && dropResult) {
-        console.log(`You dropped ${item.name} into ${dropResult.name}!`)
+        console.log(`You dropped ${item.name} into ${dropResult.name}!`);
+        onAddToRole(student, dropResult.name);
       }
     },
     collect: (monitor) => ({
@@ -28,13 +31,11 @@ export const StudentItem: FC<Props> = ({ name }) => {
     }),
   }))
 
-  const opacity = isDragging ? "opacity-50" : "opacity-100"
-
   return (
-    <span className={`${opacity}`}>
-      <Chip size="lg" ref={drag} >
-        {name}
-      </Chip>
+    <span>
+    <Chip size="md" ref={drag} className={isDragging ? "opacity-50" : "opacity-100"} variant={student.roles.length === 0 ? "outlined" : "solid"} color={student.roles.length === 0 ? "primary" : "danger"}>
+      {student.name} ({student.roles.map((role) => role)})
+    </Chip>
     </span>
   )
 }

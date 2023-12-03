@@ -28,35 +28,33 @@ export const RoleCard: FC<Props> = ({ name }) => {
   }))
 
   const isActive = canDrop && isOver
-  let backgroundColor = '#222'
-  if (isActive) {
-    backgroundColor = 'darkgreen'
-  } else if (canDrop) {
-    backgroundColor = 'darkkhaki'
-  }
 
   return (
-    <Card variant={isActive ? "solid" : "outlined" } invertedColors={isActive} sx={{ width: 320, height: 300 }} ref={drop}>
-      <CardContent>
-        <Typography level="title-lg">{name}</Typography>
-        {
-          students.map((name) => (
-            <Typography level="body-sm">{name}</Typography>
-          ))
-        }
-      </CardContent>
-      <CardOverflow variant="soft" sx={{ bgcolor: 'background.level1' }}>
-        <Divider inset="context" />
-        <CardContent orientation="horizontal">
-          <Typography level="body-xs" fontWeight="md" textColor="text.secondary">
-            {students.length} students
-          </Typography>
-          <Divider orientation="vertical" />
-          <Typography level="body-xs" fontWeight="md" textColor="text.secondary">
-            1 hour ago
-          </Typography>
+    <div className="min-h-[200px] min-w-[250px]">
+      <Card variant={isActive ? "solid" : "outlined" } invertedColors={isActive} ref={drop} sx={{width: '100%', height: '100%'}}>
+        <CardContent>
+          {/* <div className="min-h-[300]"> */}
+            <Typography level="title-lg" key={name}>{name}</Typography>
+            {
+              students.map((name) => (
+                <Typography level="body-sm">{name}</Typography>
+              ))
+            }
+          {/* </div> */}
         </CardContent>
-      </CardOverflow>
-    </Card>
+        <CardOverflow variant="soft" sx={{ bgcolor: 'background.level1' }}>
+          <Divider inset="context" />
+          <CardContent orientation="horizontal">
+            <Typography level="body-xs" fontWeight="md" textColor="text.secondary">
+              {students.length} students
+            </Typography>
+            <Divider orientation="vertical" />
+            <Typography level="body-xs" fontWeight="md" textColor="text.secondary">
+              1 hour ago
+            </Typography>
+          </CardContent>
+        </CardOverflow>
+      </Card>
+    </div>
   )
 }
