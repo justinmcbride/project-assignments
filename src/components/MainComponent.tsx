@@ -21,7 +21,7 @@ const MainComponent = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <main className="flex flex-col items-center justify-between p-24">
+      <main className="flex flex-col items-center justify-between p-8">
         <Grid container>
           <Grid container xs={8}>
             {roles.map((role) => (
