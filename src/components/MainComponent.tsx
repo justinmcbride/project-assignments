@@ -1,12 +1,11 @@
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RoleCard } from "@/components/RoleCard";
-import { StudentItem, Style } from "@/components/StudentItem";
+import { StudentItem } from "@/components/StudentItem";
 import { Divider, Grid, Stack, Typography } from "@mui/joy";
 import { useAppState } from "@/AppContext";
-import { useCallback, useMemo } from "react";
-import Role from "@/types/Role";
-import Student from "@/types/Student";
+import { useMemo } from "react";
+
 
 export default () => {
   const { state } = useAppState();
@@ -23,7 +22,7 @@ export default () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <main className="flex flex-col items-center justify-between p-24">
         <Grid container>
           <Grid container xs={8}>
             {roles.map((role) => (

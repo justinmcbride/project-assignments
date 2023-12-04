@@ -4,9 +4,10 @@ import {
   CardContent,
   CardOverflow,
   Divider,
+  Grid,
   Typography,
 } from "@mui/joy";
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 
 import { ItemTypes } from "./ItemTypes";
 
@@ -28,7 +29,9 @@ export const RoleCard: FC<Props> = ({ role }) => {
   const allStudents = state.students;
   const students = useMemo(() => {
     return allStudents.filter((s) => studentNames.includes(s.name));
-  }, allStudents);
+  }, [allStudents, studentNames]);
+
+
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
@@ -36,11 +39,15 @@ export const RoleCard: FC<Props> = ({ role }) => {
       console.log(`role ${role.name} dropped on`);
       return { role }
     },
+    canDrop: (item: Student, monitor: any) => {
+      const canDrop = !studentNames.includes(item.name);
+      return canDrop;
+    },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
-  }));
+  }), [role]);
 
   const isActive = canDrop && isOver;
 
@@ -58,10 +65,14 @@ export const RoleCard: FC<Props> = ({ role }) => {
       >
         <CardContent>
           <Typography level="h3">{name}</Typography>
+          <Divider />
           <Typography level="title-md">{description}</Typography>
+          <Divider>Students</Divider>
+          <Grid container>
           {students.map((student) => (
             <StudentItem key={student.name} student={student} parentRole={role}/>
           ))}
+            </Grid>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
           <Divider inset="context" />
@@ -73,14 +84,14 @@ export const RoleCard: FC<Props> = ({ role }) => {
             >
               {students.length} students
             </Typography>
-            <Divider orientation="vertical" />
+            {/* <Divider orientation="vertical" />
             <Typography
               level="body-xs"
               fontWeight="md"
               textColor="text.secondary"
             >
               1 hour ago
-            </Typography>
+            </Typography> */}
           </CardContent>
         </CardOverflow>
       </Card>

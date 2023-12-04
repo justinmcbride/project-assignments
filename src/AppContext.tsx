@@ -70,7 +70,7 @@ const studentsReducer = (students: Student[], action: StudentAction) => {
     case "ADD_STUDENT_TO_ROLE":
       return students.map((s) =>
         s.name == action.student.name
-          ? { ...s, roles: s.roles.concat(action.role) }
+          ? { ...s, roles: s.roles.includes(action.role) ? s.roles : s.roles.concat(action.role) }
           : s
       );
     case "REMOVE_STUDENT_FROM_ROLE":
@@ -89,7 +89,7 @@ const rolesReducer = (roles: Role[], action: StudentAction) => {
     case "ADD_STUDENT_TO_ROLE":
       return roles.map((r) =>
         r.name == action.role.name
-          ? { ...r, students: r.students.concat(action.student.name) }
+          ? { ...r, students: r.students.includes(action.student.name) ? r.students : r.students.concat(action.student.name) }
           : r
       );
     case "REMOVE_STUDENT_FROM_ROLE":

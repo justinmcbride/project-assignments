@@ -44,6 +44,8 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
     }),
   }));
 
+  const rolesCountText = student.roles.length > 1 ? ` (in ${student.roles.length} roles)` : "";
+
   return (
     <span>
       <Chip
@@ -53,7 +55,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
         color={student.roles.length === 0 ? "primary" : student.roles.length > 1 ? "danger" : "success"}
         endDecorator={parentRole ? <ChipDelete onDelete={handleRemoveFromRole}/> : null}
       >
-        {student.name}
+        {student.name}{rolesCountText}
       </Chip>
     </span>
   );
