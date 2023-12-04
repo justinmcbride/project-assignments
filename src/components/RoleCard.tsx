@@ -6,29 +6,36 @@ import {
   Divider,
   Typography,
 } from "@mui/joy";
-import { FC, useCallback, useState } from "react";
+import { FC, useMemo } from "react";
 
 import { ItemTypes } from "./ItemTypes";
 
 import { useDrop } from "react-dnd";
 import Role from "@/types/Role";
+import Student from "@/types/Student";
+import { StudentItem, Style } from "./StudentItem";
+import { useAppState } from "@/AppContext";
 
 interface Props {
   role: Role;
 }
 
 export const RoleCard: FC<Props> = ({ role }) => {
-  const [students, setStudents] = useState<string[]>([]);
+  const { name, description, desiredStudents, students: studentNames } = role;
 
-  const handleDrop = useCallback((item: any) => {
-    setStudents((students) => [...students, item.name]);
-    return {
-      name: role.name,
-    };
-  }, []);
+  const { state } = useAppState();
+
+  const allStudents = state.students;
+  const students = useMemo(() => {
+    return allStudents.filter((s) => studentNames.includes(s.name));
+  }, allStudents);
+
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
-    drop: handleDrop,
+    drop: () => {
+      console.log(`role ${role.name} dropped on`);
+      return { role }
+    },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -39,9 +46,9 @@ export const RoleCard: FC<Props> = ({ role }) => {
 
   return (
     <Badge
-      badgeContent={`${students.length}/${role.desiredStudents}`}
-      color={students.length === role.desiredStudents ? "success" : students.length < role.desiredStudents ? "neutral" : "danger"}
-      className="min-h-[200px] min-w-[250px]"
+      badgeContent={`${students.length}/${desiredStudents}`}
+      color={students.length === desiredStudents ? "success" : students.length < desiredStudents ? "neutral" : "danger"}
+      className="min-h-[200px] w-[300px]"
     >
       <Card
         variant={isActive ? "solid" : "outlined"}
@@ -50,10 +57,10 @@ export const RoleCard: FC<Props> = ({ role }) => {
         sx={{ width: "100%", height: "100%" }}
       >
         <CardContent>
-          <Typography level="h1">{role.name}</Typography>
-          <Typography level="title-md">{role.description}</Typography>
-          {students.map((name) => (
-            <Typography level="body-sm">{name}</Typography>
+          <Typography level="h3">{name}</Typography>
+          <Typography level="title-md">{description}</Typography>
+          {students.map((student) => (
+            <StudentItem key={student.name} student={student} parentRole={role}/>
           ))}
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>

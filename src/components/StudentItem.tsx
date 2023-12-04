@@ -1,28 +1,41 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { useDrag } from "react-dnd";
 
 import { ItemTypes } from "./ItemTypes";
-import { Card, CardOverflow, Chip, Typography } from "@mui/joy";
+import { Chip, ChipDelete } from "@mui/joy";
 import Student from "@/types/Student";
+import Role from "@/types/Role";
+import { useAppState } from "@/AppContext";
 
 interface Props {
   student: Student;
-  onAddToRole: (student: Student, role: string) => void;
+  parentRole?: Role;
 }
 
 interface DropResult {
-  name: string;
+  role: Role;
 }
 
-export const StudentItem: FC<Props> = ({ student, onAddToRole }) => {
+export const StudentItem: FC<Props> = ({ student, parentRole }) => {
+  const { dispatch } = useAppState();
+
+  const handleAddStudentToRole = useCallback((student: Student, role: Role) => {
+    dispatch({ type: "ADD_STUDENT_TO_ROLE", student, role });
+  }, [dispatch]);
+
+  const handleRemoveFromRole = useCallback(() => {
+    if (!parentRole) return;
+    dispatch({ type: "REMOVE_STUDENT_FROM_ROLE", student, role: parentRole });
+  }, [dispatch]);
+  
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.BOX,
     item: student,
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult<DropResult>();
       if (item && dropResult) {
-        console.log(`You dropped ${item.name} into ${dropResult.name}!`);
-        onAddToRole(student, dropResult.name);
+        console.log(`You dropped ${item.name} into ${dropResult.role.name}!`);
+        handleAddStudentToRole(student, dropResult.role);
       }
     },
     collect: (monitor) => ({
@@ -32,32 +45,16 @@ export const StudentItem: FC<Props> = ({ student, onAddToRole }) => {
   }));
 
   return (
-    <Card ref={drag} variant={isDragging ? "soft" : "outlined"}>
+    <span>
       <Chip
         size="md"
+        ref={drag}
         variant={student.roles.length === 0 ? "outlined" : "solid"}
-        color={student.roles.length === 0 ? "primary" : "danger"}
+        color={student.roles.length === 0 ? "primary" : student.roles.length > 1 ? "danger" : "success"}
+        endDecorator={parentRole ? <ChipDelete onDelete={handleRemoveFromRole}/> : null}
       >
         {student.name}
       </Chip>
-      <CardOverflow
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 1,
-          justifyContent: "space-around",
-          py: 1,
-          borderTop: "1px solid",
-          borderColor: "divider",
-        }}
-        variant="soft"
-      >
-        <Typography level="body-sm">
-          {student.roles.length > 0
-            ? ` (${student.roles.toString()})`
-            : "No roles"}
-        </Typography>
-      </CardOverflow>
-    </Card>
+    </span>
   );
 };

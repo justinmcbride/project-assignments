@@ -1,4 +1,6 @@
+import Role from "./Role";
+
 export default interface Student {
   name: string;
-  roles: string[];
+  roles: Role[];
 }
