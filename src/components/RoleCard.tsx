@@ -7,14 +7,14 @@ import {
   Grid,
   Typography,
 } from "@mui/joy";
-import { FC, useCallback, useMemo } from "react";
+import { FC, useMemo } from "react";
 
 import { ItemTypes } from "./ItemTypes";
 
 import { useDrop } from "react-dnd";
 import Role from "@/types/Role";
 import Student from "@/types/Student";
-import { StudentItem, Style } from "./StudentItem";
+import { StudentItem } from "./StudentItem";
 import { useAppState } from "@/AppContext";
 
 interface Props {
@@ -31,30 +31,37 @@ export const RoleCard: FC<Props> = ({ role }) => {
     return allStudents.filter((s) => studentNames.includes(s.name));
   }, [allStudents, studentNames]);
 
-
-
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: ItemTypes.BOX,
-    drop: () => {
-      console.log(`role ${role.name} dropped on`);
-      return { role }
-    },
-    canDrop: (item: Student, monitor: any) => {
-      const canDrop = !studentNames.includes(item.name);
-      return canDrop;
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
+  const [{ canDrop, isOver }, drop] = useDrop(
+    () => ({
+      accept: ItemTypes.BOX,
+      drop: () => {
+        console.log(`role ${role.name} dropped on`);
+        return { role };
+      },
+      canDrop: (item: Student, monitor: any) => {
+        const canDrop = !studentNames.includes(item.name);
+        return canDrop;
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
     }),
-  }), [role]);
+    [role]
+  );
 
   const isActive = canDrop && isOver;
 
   return (
     <Badge
       badgeContent={`${students.length}/${desiredStudents}`}
-      color={students.length === desiredStudents ? "success" : students.length < desiredStudents ? "neutral" : "danger"}
+      color={
+        students.length === desiredStudents
+          ? "success"
+          : students.length < desiredStudents
+            ? "neutral"
+            : "danger"
+      }
       className="min-h-[200px] w-[300px]"
     >
       <Card
@@ -69,10 +76,14 @@ export const RoleCard: FC<Props> = ({ role }) => {
           <Typography level="title-md">{description}</Typography>
           <Divider>Students</Divider>
           <Grid container>
-          {students.map((student) => (
-            <StudentItem key={student.name} student={student} parentRole={role}/>
-          ))}
-            </Grid>
+            {students.map((student) => (
+              <StudentItem
+                key={student.name}
+                student={student}
+                parentRole={role}
+              />
+            ))}
+          </Grid>
         </CardContent>
         <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
           <Divider inset="context" />

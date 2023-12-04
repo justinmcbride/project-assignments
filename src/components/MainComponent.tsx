@@ -6,8 +6,7 @@ import { Divider, Grid, Stack, Typography } from "@mui/joy";
 import { useAppState } from "@/AppContext";
 import { useMemo } from "react";
 
-
-export default () => {
+const MainComponent = () => {
   const { state } = useAppState();
 
   const students = state.students;
@@ -26,10 +25,7 @@ export default () => {
         <Grid container>
           <Grid container xs={8}>
             {roles.map((role) => (
-              <RoleCard
-                key={role.name}
-                role={role}
-              />
+              <RoleCard key={role.name} role={role} />
             ))}
           </Grid>
           <Grid container xs={4}>
@@ -41,10 +37,7 @@ export default () => {
               </Divider>
               <Grid container>
                 {availableStudents.map((student) => (
-                  <StudentItem
-                    student={student}
-                    key={student.name}
-                  />
+                  <StudentItem student={student} key={student.name} />
                 ))}
               </Grid>
               <Divider>
@@ -52,10 +45,7 @@ export default () => {
               </Divider>
               <Grid container>
                 {assignedStudents.map((student) => (
-                  <StudentItem
-                    student={student}
-                    key={student.name}
-                  />
+                  <StudentItem student={student} key={student.name} />
                 ))}
               </Grid>
             </Stack>
@@ -65,3 +55,5 @@ export default () => {
     </DndProvider>
   );
 };
+
+export default MainComponent;
