@@ -37,8 +37,10 @@ const MainComponent = () => {
           <Grid xs={12}>
             <Grid container spacing={2}>
               {roles.map((role) => (
-                <Grid xs={12} sm={6} md={4} xl={3} key={role.name}>
-                  <RoleCard role={role} />
+                <Grid xs={12} sm={6} md={4} xl={3} key={role.name} sx={{ display: 'flex', minWidth: 0 }}>
+                  <div style={{ width: '100%', display: 'flex' }}>
+                    <RoleCard role={role} />
+                  </div>
                 </Grid>
               ))}
             </Grid>
