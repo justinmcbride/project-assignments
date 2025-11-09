@@ -49,7 +49,7 @@ const MainComponent = () => {
         
         {/* Roles grid - fixed 2 rows x 4 columns */}
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: '1rem', minHeight: 0 }}>
-          {roles.slice(0, 8).map((role) => (
+          {roles.map((role) => (
             <div key={role.name} style={{ minWidth: 0, minHeight: 0 }}>
               <RoleCard role={role} />
             </div>

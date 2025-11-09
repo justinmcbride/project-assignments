@@ -155,10 +155,15 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     <Modal open={open} onClose={onClose}>
       <ModalDialog sx={{ width: "90vw", maxWidth: 800, maxHeight: "90vh", overflow: "auto" }}>
         <ModalClose />
-        <div className="flex items-center justify-between mb-2">
-          <Typography level="h4">
-            Configure Students and Roles
-          </Typography>
+        <Typography level="h4" sx={{ mb: 1 }}>
+          Configure Students and Roles
+        </Typography>
+        
+        <Typography level="body-sm" sx={{ mb: 2, fontStyle: "italic", color: "text.tertiary" }}>
+          💾 All changes are automatically saved to your browser
+        </Typography>
+
+        <div className="flex justify-center mb-3">
           <Button
             variant="outlined"
             color="warning"
@@ -169,10 +174,6 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
             Reset to Defaults
           </Button>
         </div>
-        
-        <Typography level="body-sm" sx={{ mb: 2, fontStyle: "italic", color: "text.tertiary" }}>
-          💾 All changes are automatically saved to your browser
-        </Typography>
 
         <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value as number)}>
           <TabList>
