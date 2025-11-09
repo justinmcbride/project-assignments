@@ -67,8 +67,6 @@ export const RoleCard: FC<Props> = ({ role }) => {
         sx={{ 
           width: "100%",
           height: "100%",
-          minHeight: "280px",
-          maxHeight: "280px",
           display: "flex",
           flexDirection: "column",
           transition: 'all 0.2s ease-in-out',
