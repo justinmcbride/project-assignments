@@ -161,6 +161,11 @@ interface HydrateStateAction {
   payload: InitialStateType;
 }
 
+interface ImportStudentsAction {
+  type: "IMPORT_STUDENTS";
+  students: string[];
+}
+
 type StudentAction = 
   | StudentAddToRoleAction 
   | StudentRemoveFromRoleAction
@@ -171,7 +176,8 @@ type StudentAction =
   | RemoveRoleAction
   | UpdateRoleAction
   | ResetStateAction
-  | HydrateStateAction;
+  | HydrateStateAction
+  | ImportStudentsAction;
 
 const studentsReducer = (students: Student[], action: StudentAction) => {
   switch (action.type) {
@@ -206,6 +212,8 @@ const studentsReducer = (students: Student[], action: StudentAction) => {
       return previewStudents;
     case "HYDRATE_STATE":
       return action.payload.students;
+    case "IMPORT_STUDENTS":
+      return action.students.map((name) => ({ name, roles: [] }));
     default:
       return students;
   }
@@ -259,6 +267,9 @@ const rolesReducer = (roles: Role[], action: StudentAction) => {
       return previewRoles;
     case "HYDRATE_STATE":
       return action.payload.roles;
+    case "IMPORT_STUDENTS":
+      // Clear all student assignments from roles when importing new students
+      return roles.map((r) => ({ ...r, students: [] }));
     default:
       return roles;
   }

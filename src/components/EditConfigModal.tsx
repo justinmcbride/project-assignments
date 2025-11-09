@@ -21,6 +21,7 @@ import {
   ListItemContent,
   ListItemDecorator,
   Divider,
+  Alert,
 } from "@mui/joy";
 import { useAppState } from "@/AppContext";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -31,6 +32,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import RestoreIcon from "@mui/icons-material/Restore";
+import UploadIcon from "@mui/icons-material/Upload";
 
 interface EditConfigModalProps {
   open: boolean;
@@ -45,6 +47,11 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
   const [newStudentName, setNewStudentName] = useState("");
   const [editingStudent, setEditingStudent] = useState<string | null>(null);
   const [editStudentName, setEditStudentName] = useState("");
+  
+  // Import students state
+  const [showImportInput, setShowImportInput] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importError, setImportError] = useState("");
 
   // Role editing state
   const [newRole, setNewRole] = useState({
@@ -62,6 +69,16 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
   // Student handlers
   const handleAddStudent = () => {
     if (newStudentName.trim()) {
+      // Check for duplicate student name
+      const isDuplicate = state.students.some(
+        (s) => s.name.toLowerCase() === newStudentName.trim().toLowerCase()
+      );
+      
+      if (isDuplicate) {
+        alert(`A student named "${newStudentName.trim()}" already exists.`);
+        return;
+      }
+      
       dispatch({ type: "ADD_STUDENT", name: newStudentName.trim() });
       setNewStudentName("");
     }
@@ -78,6 +95,19 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
 
   const handleSaveStudent = () => {
     if (editingStudent && editStudentName.trim()) {
+      // Check if the new name is different from the old name
+      if (editStudentName.trim() !== editingStudent) {
+        // Check for duplicate student name
+        const isDuplicate = state.students.some(
+          (s) => s.name.toLowerCase() === editStudentName.trim().toLowerCase()
+        );
+        
+        if (isDuplicate) {
+          alert(`A student named "${editStudentName.trim()}" already exists.`);
+          return;
+        }
+      }
+      
       dispatch({
         type: "UPDATE_STUDENT",
         oldName: editingStudent,
@@ -93,9 +123,68 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     setEditStudentName("");
   };
 
+  const handleToggleImport = () => {
+    setShowImportInput(!showImportInput);
+    setImportText("");
+    setImportError("");
+  };
+
+  const handleImportStudents = () => {
+    setImportError("");
+    
+    // Parse and validate the comma-separated list
+    const studentNames = importText
+      .split(",")
+      .map((name) => name.trim())
+      .filter((name) => name.length > 0);
+
+    // Validation
+    if (studentNames.length === 0) {
+      setImportError("Please enter at least one student name");
+      return;
+    }
+
+    // Check for duplicates
+    const uniqueNames = new Set(studentNames);
+    if (uniqueNames.size !== studentNames.length) {
+      setImportError("Duplicate student names found in the list");
+      return;
+    }
+
+    // Check if names are valid (not empty, reasonable length)
+    const invalidNames = studentNames.filter(
+      (name) => name.length < 1 || name.length > 100
+    );
+    if (invalidNames.length > 0) {
+      setImportError("Some student names are too long or invalid");
+      return;
+    }
+
+    // Confirm override
+    if (
+      confirm(
+        `This will replace all ${state.students.length} existing students with ${studentNames.length} new students. All role assignments will be cleared. Continue?`
+      )
+    ) {
+      dispatch({ type: "IMPORT_STUDENTS", students: studentNames });
+      setImportText("");
+      setShowImportInput(false);
+    }
+  };
+
   // Role handlers
   const handleAddRole = () => {
     if (newRole.name.trim() && newRole.description.trim()) {
+      // Check for duplicate role name
+      const isDuplicate = state.roles.some(
+        (r) => r.name.toLowerCase() === newRole.name.trim().toLowerCase()
+      );
+      
+      if (isDuplicate) {
+        alert(`A role named "${newRole.name.trim()}" already exists.`);
+        return;
+      }
+      
       dispatch({
         type: "ADD_ROLE",
         role: {
@@ -126,6 +215,19 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
 
   const handleSaveRole = () => {
     if (editingRole && editRoleData.name.trim() && editRoleData.description.trim()) {
+      // Check if the new name is different from the old name
+      if (editRoleData.name.trim() !== editingRole) {
+        // Check for duplicate role name
+        const isDuplicate = state.roles.some(
+          (r) => r.name.toLowerCase() === editRoleData.name.trim().toLowerCase()
+        );
+        
+        if (isDuplicate) {
+          alert(`A role named "${editRoleData.name.trim()}" already exists.`);
+          return;
+        }
+      }
+      
       dispatch({
         type: "UPDATE_ROLE",
         oldName: editingRole,
@@ -189,25 +291,70 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
 
           {/* Students Tab */}
           <TabPanel value={0} sx={{ p: 2 }}>
-            <Typography level="title-md" sx={{ mb: 2 }}>
-              Add New Student
-            </Typography>
-            <div className="flex gap-2 mb-4">
-              <Input
-                placeholder="Student name"
-                value={newStudentName}
-                onChange={(e) => setNewStudentName(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleAddStudent()}
-                sx={{ flex: 1 }}
-              />
+            <div className="flex items-center justify-between mb-2">
+              <Typography level="title-md">
+                Add New Student
+              </Typography>
               <Button
-                startDecorator={<AddIcon />}
-                onClick={handleAddStudent}
-                disabled={!newStudentName.trim()}
+                variant="soft"
+                color="primary"
+                startDecorator={<UploadIcon />}
+                onClick={handleToggleImport}
+                size="sm"
               >
-                Add
+                {showImportInput ? "Cancel Import" : "Import List"}
               </Button>
             </div>
+
+            {!showImportInput ? (
+              <div className="flex gap-2 mb-4">
+                <Input
+                  placeholder="Student name"
+                  value={newStudentName}
+                  onChange={(e) => setNewStudentName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddStudent()}
+                  sx={{ flex: 1 }}
+                />
+                <Button
+                  startDecorator={<AddIcon />}
+                  onClick={handleAddStudent}
+                  disabled={!newStudentName.trim()}
+                >
+                  Add
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 mb-4">
+                <Textarea
+                  placeholder="Enter student names separated by commas (e.g., John Doe, Jane Smith, Bob Johnson)"
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  minRows={3}
+                  maxRows={6}
+                />
+                {importError && (
+                  <Alert color="danger" size="sm">
+                    {importError}
+                  </Alert>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    startDecorator={<UploadIcon />}
+                    onClick={handleImportStudents}
+                    disabled={!importText.trim()}
+                    color="success"
+                  >
+                    Import and Replace All
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={handleToggleImport}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
 
             <Divider sx={{ my: 2 }} />
 
