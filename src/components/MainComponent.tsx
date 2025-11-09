@@ -13,7 +13,7 @@ const MainComponent = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <main className="w-full h-screen flex flex-col p-4" style={{ maxHeight: '100vh', overflow: 'hidden' }}>
+      <main className="w-full flex flex-col" style={{ height: 'calc(100vh - 10rem)', overflow: 'hidden' }}>
         {/* Students section at the top */}
         <div className="bg-white rounded-lg shadow-md p-3 mb-4" style={{ flexShrink: 0 }}>
           <Divider sx={{ mb: 2 }}>
