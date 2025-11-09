@@ -30,6 +30,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import WorkIcon from "@mui/icons-material/Work";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
+import RestoreIcon from "@mui/icons-material/Restore";
 
 interface EditConfigModalProps {
   open: boolean;
@@ -144,12 +145,33 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     setEditRoleData({ name: "", description: "", desiredStudents: 1 });
   };
 
+  const handleResetToDefaults = () => {
+    if (confirm("Are you sure you want to reset to default students and roles? This will clear all assignments and custom data.")) {
+      dispatch({ type: "RESET_STATE" });
+    }
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <ModalDialog sx={{ width: "90vw", maxWidth: 800, maxHeight: "90vh", overflow: "auto" }}>
         <ModalClose />
-        <Typography level="h4" sx={{ mb: 2 }}>
-          Configure Students and Roles
+        <div className="flex items-center justify-between mb-2">
+          <Typography level="h4">
+            Configure Students and Roles
+          </Typography>
+          <Button
+            variant="outlined"
+            color="warning"
+            startDecorator={<RestoreIcon />}
+            onClick={handleResetToDefaults}
+            size="sm"
+          >
+            Reset to Defaults
+          </Button>
+        </div>
+        
+        <Typography level="body-sm" sx={{ mb: 2, fontStyle: "italic", color: "text.tertiary" }}>
+          💾 All changes are automatically saved to your browser
         </Typography>
 
         <Tabs value={activeTab} onChange={(_, value) => setActiveTab(value as number)}>

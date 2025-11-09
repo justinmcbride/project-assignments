@@ -7,6 +7,8 @@ import {
   createContext,
   useContext,
   useReducer,
+  useEffect,
+  useState,
 } from "react";
 import previewStudents from "./previewData/previewStudents";
 import previewRoles from "@/previewData/previewRoles";
@@ -18,6 +20,41 @@ type InitialStateType = {
   roles: Role[];
 };
 
+const STORAGE_KEY = "project-assignments-state";
+
+// Load state from localStorage
+const loadStateFromLocalStorage = (): InitialStateType | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      // Validate that the parsed state has the expected structure
+      if (parsed.students && parsed.roles && Array.isArray(parsed.students) && Array.isArray(parsed.roles)) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to load state from localStorage:", error);
+  }
+
+  return null;
+};
+
+// Save state to localStorage
+const saveStateToLocalStorage = (state: InitialStateType) => {
+  if (typeof window === "undefined") return;
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error("Failed to save state to localStorage:", error);
+  }
+};
+
 const initialState: InitialStateType = {
   students: previewStudents,
   roles: previewRoles,
@@ -27,7 +64,7 @@ export const AppContext = createContext<{
   state: InitialStateType;
   dispatch: Dispatch<StudentAction>;
 }>({
-  state: { students: previewStudents, roles: previewRoles },
+  state: initialState,
   dispatch: () => null,
 });
 
@@ -41,6 +78,24 @@ const mainReducer = (
 
 export const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(mainReducer, initialState);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Load from localStorage after hydration
+  useEffect(() => {
+    const savedState = loadStateFromLocalStorage();
+    if (savedState) {
+      // Dispatch actions to update state with saved data
+      dispatch({ type: "HYDRATE_STATE", payload: savedState });
+    }
+    setIsHydrated(true);
+  }, []);
+
+  // Save to localStorage whenever state changes (but only after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      saveStateToLocalStorage(state);
+    }
+  }, [state, isHydrated]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
@@ -97,6 +152,15 @@ interface UpdateRoleAction {
   role: Omit<Role, "students">;
 }
 
+interface ResetStateAction {
+  type: "RESET_STATE";
+}
+
+interface HydrateStateAction {
+  type: "HYDRATE_STATE";
+  payload: InitialStateType;
+}
+
 type StudentAction = 
   | StudentAddToRoleAction 
   | StudentRemoveFromRoleAction
@@ -105,7 +169,9 @@ type StudentAction =
   | UpdateStudentAction
   | AddRoleAction
   | RemoveRoleAction
-  | UpdateRoleAction;
+  | UpdateRoleAction
+  | ResetStateAction
+  | HydrateStateAction;
 
 const studentsReducer = (students: Student[], action: StudentAction) => {
   switch (action.type) {
@@ -136,6 +202,10 @@ const studentsReducer = (students: Student[], action: StudentAction) => {
           ? { ...s, name: action.newName }
           : s
       );
+    case "RESET_STATE":
+      return previewStudents;
+    case "HYDRATE_STATE":
+      return action.payload.students;
     default:
       return students;
   }
@@ -185,6 +255,10 @@ const rolesReducer = (roles: Role[], action: StudentAction) => {
           ? { ...action.role, students: r.students }
           : r
       );
+    case "RESET_STATE":
+      return previewRoles;
+    case "HYDRATE_STATE":
+      return action.payload.roles;
     default:
       return roles;
   }
