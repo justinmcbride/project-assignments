@@ -24,6 +24,7 @@ import {
   Alert,
 } from "@mui/joy";
 import { useAppState } from "@/AppContext";
+import { exportAssignmentsToFile } from "@/utils/exportAssignments";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
@@ -33,6 +34,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import RestoreIcon from "@mui/icons-material/Restore";
 import UploadIcon from "@mui/icons-material/Upload";
+import DownloadIcon from "@mui/icons-material/Download";
 
 interface EditConfigModalProps {
   open: boolean;
@@ -253,6 +255,13 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     }
   };
 
+  const handleExportToText = async () => {
+    await exportAssignmentsToFile({
+      roles: state.roles,
+      students: state.students,
+    });
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <ModalDialog sx={{ width: "90vw", maxWidth: 800, maxHeight: "90vh", overflow: "auto" }}>
@@ -265,7 +274,16 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
           💾 All changes are automatically saved to your browser
         </Typography>
 
-        <div className="flex justify-center mb-3">
+        <div className="flex justify-center gap-2 mb-3">
+          <Button
+            variant="outlined"
+            color="success"
+            startDecorator={<DownloadIcon />}
+            onClick={handleExportToText}
+            size="sm"
+          >
+            Export assignments
+          </Button>
           <Button
             variant="outlined"
             color="warning"
