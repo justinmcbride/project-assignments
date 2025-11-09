@@ -2,9 +2,8 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RoleCard } from "@/components/RoleCard";
 import { StudentItem } from "@/components/StudentItem";
-import { Divider, Grid, Stack, Typography } from "@mui/joy";
+import { Divider, Grid, Typography } from "@mui/joy";
 import { useAppState } from "@/AppContext";
-import { useMemo } from "react";
 
 const MainComponent = () => {
   const { state } = useAppState();
@@ -12,43 +11,36 @@ const MainComponent = () => {
   const students = state.students;
   const roles = state.roles;
 
-  const availableStudents = useMemo(() => {
-    return students.filter((s) => s.roles.length === 0);
-  }, [students]);
-  const assignedStudents = useMemo(() => {
-    return students.filter((s) => s.roles.length > 0);
-  }, [students]);
-
   return (
     <DndProvider backend={HTML5Backend}>
-      <main className="flex flex-col items-center justify-between p-8">
-        <Grid container>
-          <Grid container xs={8}>
-            {roles.map((role) => (
-              <RoleCard key={role.name} role={role} />
-            ))}
+      <main className="w-full">
+        <Grid container spacing={2}>
+          <Grid xs={12} lg={9}>
+            <Grid container spacing={2}>
+              {roles.map((role) => (
+                <Grid xs={12} sm={6} md={4} xl={3} key={role.name}>
+                  <RoleCard role={role} />
+                </Grid>
+              ))}
+            </Grid>
           </Grid>
-          <Grid container xs={4}>
-            <Stack direction={"column"} spacing={2}>
-              <Divider>
-                <Typography level="h3" sx={{ color: "text.primary" }}>
-                  Available Students
-                </Typography>
-              </Divider>
-              <Grid container>
-                {availableStudents.map((student) => (
-                  <StudentItem student={student} key={student.name} />
-                ))}
-              </Grid>
-              <Divider>
-                <Typography level="h3">Assigned Students</Typography>
-              </Divider>
-              <Grid container>
-                {assignedStudents.map((student) => (
-                  <StudentItem student={student} key={student.name} />
-                ))}
-              </Grid>
-            </Stack>
+          <Grid xs={12} lg={3}>
+            <div className="lg:sticky lg:top-4">
+              <div className="bg-white rounded-lg shadow-md p-3">
+                <Divider sx={{ mb: 2 }}>
+                  <Typography level="title-lg" sx={{ color: "primary.600" }}>
+                    All Students
+                  </Typography>
+                </Divider>
+                <Grid container spacing={1}>
+                  {students.map((student) => (
+                    <Grid xs="auto" key={student.name}>
+                      <StudentItem student={student} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </div>
+            </div>
           </Grid>
         </Grid>
       </main>

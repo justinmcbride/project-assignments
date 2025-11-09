@@ -51,25 +51,34 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
     student.roles.length > 1 ? ` (in ${student.roles.length} roles)` : "";
 
   return (
-    <span>
-      <Chip
-        size="md"
-        ref={drag}
-        variant={student.roles.length === 0 ? "outlined" : "solid"}
-        color={
-          student.roles.length === 0
-            ? "primary"
-            : student.roles.length > 1
-              ? "danger"
-              : "success"
+    <Chip
+      size="md"
+      ref={drag}
+      variant={student.roles.length === 0 ? "outlined" : "solid"}
+      color={
+        student.roles.length === 0
+          ? "primary"
+          : student.roles.length > 1
+            ? "danger"
+            : "success"
+      }
+      endDecorator={
+        parentRole ? <ChipDelete onDelete={handleRemoveFromRole} /> : null
+      }
+      sx={{
+        cursor: 'grab',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'scale(1.05)',
+          boxShadow: 'sm'
+        },
+        '&:active': {
+          cursor: 'grabbing'
         }
-        endDecorator={
-          parentRole ? <ChipDelete onDelete={handleRemoveFromRole} /> : null
-        }
-      >
-        {student.name}
-        {rolesCountText}
-      </Chip>
-    </span>
+      }}
+    >
+      {student.name}
+      {rolesCountText}
+    </Chip>
   );
 };
