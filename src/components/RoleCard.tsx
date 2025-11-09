@@ -77,26 +77,16 @@ export const RoleCard: FC<Props> = ({ role }) => {
         }}
       >
       <CardContent sx={{ p: 1.5, flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: 'hidden' }}>
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <Typography 
-            level="h4" 
-            sx={{ 
-              fontSize: '1rem',
-              fontWeight: 600,
-              flex: 1
-            }}
-          >
-            {name}
-          </Typography>
-          <Chip
-            size="sm"
-            variant="solid"
-            color={assignmentColor}
-            sx={{ fontWeight: 'bold' }}
-          >
-            {students.length}/{desiredStudents}
-          </Chip>
-        </div>
+        <Typography 
+          level="h4" 
+          sx={{ 
+            fontSize: '1rem',
+            fontWeight: 600,
+            mb: 1
+          }}
+        >
+          {name}
+        </Typography>
         <Divider sx={{ my: 1 }} />
         <Typography 
           level="body-sm" 
@@ -140,15 +130,25 @@ export const RoleCard: FC<Props> = ({ role }) => {
           )}
         </Grid>
       </CardContent>
-      <CardOverflow variant="soft" sx={{ bgcolor: "background.level1" }}>
+      <CardOverflow 
+        variant="soft" 
+        sx={{ 
+          bgcolor: assignmentColor === 'danger' ? 'danger.softBg' : assignmentColor === 'success' ? 'success.softBg' : 'background.level1',
+          borderTop: assignmentColor === 'danger' ? '2px solid' : '1px solid',
+          borderColor: assignmentColor === 'danger' ? 'danger.500' : 'divider'
+        }}
+      >
         <Divider inset="context" />
         <CardContent orientation="horizontal" sx={{ py: 0.75 }}>
           <Typography
             level="body-xs"
             fontWeight="md"
-            textColor="text.secondary"
+            sx={{ 
+              color: assignmentColor === 'danger' ? 'danger.600' : assignmentColor === 'success' ? 'success.600' : 'text.secondary',
+              fontWeight: assignmentColor === 'danger' ? 'bold' : 'md'
+            }}
           >
-            {students.length} student{students.length !== 1 ? 's' : ''}
+            {students.length} / {desiredStudents} student{desiredStudents !== 1 ? 's' : ''}
           </Typography>
         </CardContent>
       </CardOverflow>
