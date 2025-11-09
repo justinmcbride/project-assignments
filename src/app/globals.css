@@ -17,3 +17,140 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+
+/* Bubble animations for GitHub link */
+.bubble-1,
+.bubble-2,
+.bubble-3,
+.bubble-4,
+.bubble-5,
+.bubble-6 {
+  opacity: 0;
+}
+
+.group:hover .bubble-1 {
+  animation: bubble-float-1 2s ease-out infinite;
+}
+
+.group:hover .bubble-2 {
+  animation: bubble-float-2 2.2s ease-out infinite 0.2s;
+}
+
+.group:hover .bubble-3 {
+  animation: bubble-float-3 1.8s ease-out infinite 0.4s;
+}
+
+.group:hover .bubble-4 {
+  animation: bubble-float-4 2.1s ease-out infinite 0.6s;
+}
+
+.group:hover .bubble-5 {
+  animation: bubble-float-5 1.9s ease-out infinite 0.8s;
+}
+
+.group:hover .bubble-6 {
+  animation: bubble-float-6 2.3s ease-out infinite 1s;
+}
+
+@keyframes bubble-float-1 {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-30px, -60px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-float-2 {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-30px, -70px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-float-3 {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-25px, -55px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-float-4 {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-35px, -65px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-float-5 {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-30px, -75px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-float-6 {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-40px, -50px) scale(1);
+    opacity: 0;
+  }
+}
