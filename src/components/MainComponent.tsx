@@ -1,12 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RoleCard } from "@/components/RoleCard";
 import { StudentItem } from "@/components/StudentItem";
-import { Divider, Grid, Typography } from "@mui/joy";
+import { EditConfigModal } from "@/components/EditConfigModal";
+import { Divider, Grid, Typography, Button } from "@mui/joy";
 import { useAppState } from "@/AppContext";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const MainComponent = () => {
   const { state } = useAppState();
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const students = state.students;
   const roles = state.roles;
@@ -16,11 +22,22 @@ const MainComponent = () => {
       <main className="w-full flex flex-col" style={{ height: 'calc(100vh - 10rem)', overflow: 'hidden' }}>
         {/* Students section at the top */}
         <div className="bg-white rounded-lg shadow-md p-3 mb-4" style={{ flexShrink: 0 }}>
-          <Divider sx={{ mb: 2 }}>
-            <Typography level="title-lg" sx={{ color: "primary.600" }}>
-              All Students
-            </Typography>
-          </Divider>
+          <div className="flex items-center justify-between mb-2">
+            <Divider sx={{ flex: 1 }}>
+              <Typography level="title-lg" sx={{ color: "primary.600" }}>
+                All Students
+              </Typography>
+            </Divider>
+            <Button
+              variant="soft"
+              color="primary"
+              startDecorator={<SettingsIcon />}
+              onClick={() => setEditModalOpen(true)}
+              sx={{ ml: 2 }}
+            >
+              Edit Config
+            </Button>
+          </div>
           <Grid container spacing={1}>
             {students.map((student) => (
               <Grid xs="auto" key={student.name}>
@@ -39,6 +56,8 @@ const MainComponent = () => {
           ))}
         </div>
       </main>
+
+      <EditConfigModal open={editModalOpen} onClose={() => setEditModalOpen(false)} />
     </DndProvider>
   );
 };

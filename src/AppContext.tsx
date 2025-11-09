@@ -65,7 +65,47 @@ interface StudentRemoveFromRoleAction {
   role: Role;
 }
 
-type StudentAction = StudentAddToRoleAction | StudentRemoveFromRoleAction;
+interface AddStudentAction {
+  type: "ADD_STUDENT";
+  name: string;
+}
+
+interface RemoveStudentAction {
+  type: "REMOVE_STUDENT";
+  name: string;
+}
+
+interface UpdateStudentAction {
+  type: "UPDATE_STUDENT";
+  oldName: string;
+  newName: string;
+}
+
+interface AddRoleAction {
+  type: "ADD_ROLE";
+  role: Omit<Role, "students">;
+}
+
+interface RemoveRoleAction {
+  type: "REMOVE_ROLE";
+  name: string;
+}
+
+interface UpdateRoleAction {
+  type: "UPDATE_ROLE";
+  oldName: string;
+  role: Omit<Role, "students">;
+}
+
+type StudentAction = 
+  | StudentAddToRoleAction 
+  | StudentRemoveFromRoleAction
+  | AddStudentAction
+  | RemoveStudentAction
+  | UpdateStudentAction
+  | AddRoleAction
+  | RemoveRoleAction
+  | UpdateRoleAction;
 
 const studentsReducer = (students: Student[], action: StudentAction) => {
   switch (action.type) {
@@ -84,6 +124,16 @@ const studentsReducer = (students: Student[], action: StudentAction) => {
       return students.map((s) =>
         s.name == action.student.name
           ? { ...s, roles: s.roles.filter((r) => r.name != action.role.name) }
+          : s
+      );
+    case "ADD_STUDENT":
+      return [...students, { name: action.name, roles: [] }];
+    case "REMOVE_STUDENT":
+      return students.filter((s) => s.name !== action.name);
+    case "UPDATE_STUDENT":
+      return students.map((s) =>
+        s.name === action.oldName
+          ? { ...s, name: action.newName }
           : s
       );
     default:
@@ -111,6 +161,28 @@ const rolesReducer = (roles: Role[], action: StudentAction) => {
               ...r,
               students: r.students.filter((s) => s != action.student.name),
             }
+          : r
+      );
+    case "REMOVE_STUDENT":
+      return roles.map((r) => ({
+        ...r,
+        students: r.students.filter((s) => s !== action.name),
+      }));
+    case "UPDATE_STUDENT":
+      return roles.map((r) => ({
+        ...r,
+        students: r.students.map((s) => 
+          s === action.oldName ? action.newName : s
+        ),
+      }));
+    case "ADD_ROLE":
+      return [...roles, { ...action.role, students: [] }];
+    case "REMOVE_ROLE":
+      return roles.filter((r) => r.name !== action.name);
+    case "UPDATE_ROLE":
+      return roles.map((r) =>
+        r.name === action.oldName
+          ? { ...action.role, students: r.students }
           : r
       );
     default:
