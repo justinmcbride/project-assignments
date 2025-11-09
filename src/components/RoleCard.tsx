@@ -38,7 +38,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
         console.log(`role ${role.name} dropped on`);
         return { role };
       },
-      canDrop: (item: Student, monitor: any) => {
+      canDrop: (item: Student) => {
         const canDrop = !studentNames.includes(item.name);
         return canDrop;
       },

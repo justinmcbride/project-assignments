@@ -31,7 +31,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
     dispatch({ type: "REMOVE_STUDENT_FROM_ROLE", student, role: parentRole });
   }, [dispatch, parentRole, student]);
 
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [, drag] = useDrag(() => ({
     type: ItemTypes.BOX,
     item: student,
     end: (item, monitor) => {
