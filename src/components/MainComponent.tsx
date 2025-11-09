@@ -15,7 +15,26 @@ const MainComponent = () => {
     <DndProvider backend={HTML5Backend}>
       <main className="w-full">
         <Grid container spacing={2}>
-          <Grid xs={12} lg={9}>
+          {/* Students section at the top */}
+          <Grid xs={12}>
+            <div className="bg-white rounded-lg shadow-md p-3">
+              <Divider sx={{ mb: 2 }}>
+                <Typography level="title-lg" sx={{ color: "primary.600" }}>
+                  All Students
+                </Typography>
+              </Divider>
+              <Grid container spacing={1}>
+                {students.map((student) => (
+                  <Grid xs="auto" key={student.name}>
+                    <StudentItem student={student} />
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
+          </Grid>
+          
+          {/* Roles grid below */}
+          <Grid xs={12}>
             <Grid container spacing={2}>
               {roles.map((role) => (
                 <Grid xs={12} sm={6} md={4} xl={3} key={role.name}>
@@ -23,24 +42,6 @@ const MainComponent = () => {
                 </Grid>
               ))}
             </Grid>
-          </Grid>
-          <Grid xs={12} lg={3}>
-            <div className="lg:sticky lg:top-4">
-              <div className="bg-white rounded-lg shadow-md p-3">
-                <Divider sx={{ mb: 2 }}>
-                  <Typography level="title-lg" sx={{ color: "primary.600" }}>
-                    All Students
-                  </Typography>
-                </Divider>
-                <Grid container spacing={1}>
-                  {students.map((student) => (
-                    <Grid xs="auto" key={student.name}>
-                      <StudentItem student={student} />
-                    </Grid>
-                  ))}
-                </Grid>
-              </div>
-            </div>
           </Grid>
         </Grid>
       </main>
