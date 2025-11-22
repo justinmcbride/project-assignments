@@ -8,7 +8,7 @@ import {
   useContext,
   useReducer,
   useEffect,
-  useState,
+  useRef,
 } from "react";
 import previewStudents from "./previewData/previewStudents";
 import previewRoles from "@/previewData/previewRoles";
@@ -78,7 +78,7 @@ const mainReducer = (
 
 export const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(mainReducer, initialState);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const hasHydratedRef = useRef(false);
 
   // Load from localStorage after hydration
   useEffect(() => {
@@ -87,15 +87,16 @@ export const AppProvider: FC<PropsWithChildren> = ({ children }) => {
       // Dispatch actions to update state with saved data
       dispatch({ type: "HYDRATE_STATE", payload: savedState });
     }
-    setIsHydrated(true);
+    hasHydratedRef.current = true;
   }, []);
 
   // Save to localStorage whenever state changes (but only after hydration)
   useEffect(() => {
-    if (isHydrated) {
-      saveStateToLocalStorage(state);
+    if (!hasHydratedRef.current) {
+      return;
     }
-  }, [state, isHydrated]);
+    saveStateToLocalStorage(state);
+  }, [state]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

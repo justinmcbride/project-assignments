@@ -6,6 +6,23 @@ interface ExportData {
   students: Student[];
 }
 
+interface FileSystemWritableFileStream {
+  write: (data: BlobPart) => Promise<void>;
+  close: () => Promise<void>;
+}
+
+interface FileSystemFileHandle {
+  createWritable: () => Promise<FileSystemWritableFileStream>;
+}
+
+type SaveFilePickerOptions = {
+  suggestedName?: string;
+  types?: Array<{
+    description?: string;
+    accept: Record<string, string[]>;
+  }>;
+};
+
 /**
  * Generates formatted text content for role assignments
  */
@@ -85,12 +102,17 @@ export function generateAssignmentsText(data: ExportData): string {
  */
 export async function exportAssignmentsToFile(data: ExportData): Promise<void> {
   const textContent = generateAssignmentsText(data);
+  type ShowSaveFilePicker = (options?: SaveFilePickerOptions) => Promise<FileSystemFileHandle>;
+  interface WindowWithSaveFilePicker extends Window {
+    showSaveFilePicker?: ShowSaveFilePicker;
+  }
+  const fsWindow = window as WindowWithSaveFilePicker;
   
   // Try to use the File System Access API (shows save dialog)
   try {
     // Check if the API is supported
-    if ('showSaveFilePicker' in window) {
-      const handle = await (window as any).showSaveFilePicker({
+    if (typeof fsWindow.showSaveFilePicker === "function") {
+      const handle = await fsWindow.showSaveFilePicker({
         suggestedName: 'roles.txt',
         types: [
           {

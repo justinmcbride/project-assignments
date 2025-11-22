@@ -2,12 +2,11 @@ import {
   Card,
   CardContent,
   CardOverflow,
-  Chip,
   Divider,
   Grid,
   Typography,
 } from "@mui/joy";
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 
 import { ItemTypes } from "./ItemTypes";
 
@@ -16,6 +15,9 @@ import Role from "@/types/Role";
 import Student from "@/types/Student";
 import { StudentItem } from "./StudentItem";
 import { useAppState } from "@/AppContext";
+
+export const ROLE_CARD_MIN_WIDTH = 240;
+export const ROLE_CARD_MIN_HEIGHT = 280;
 
 interface Props {
   role: Role;
@@ -64,16 +66,33 @@ export const RoleCard: FC<Props> = ({ role }) => {
 
   // Calculate if the drop would exceed the limit
   const wouldExceedLimit = isActive && students.length >= desiredStudents;
-  const withinLimit = isActive && students.length < desiredStudents;
+
+  const setDropRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      drop(node);
+    },
+    [drop]
+  );
 
   return (
-    <div ref={drop as any} style={{ height: '100%', width: '100%' }}>
+    <div
+      ref={setDropRef}
+      style={{
+        height: "100%",
+        width: "100%",
+        minHeight: ROLE_CARD_MIN_HEIGHT,
+        minWidth: ROLE_CARD_MIN_WIDTH,
+      }}
+    >
       <Card
         variant={isActive || isAlreadyInRole ? "solid" : "outlined"}
         invertedColors={isActive || isAlreadyInRole}
         sx={{ 
+          minWidth: ROLE_CARD_MIN_WIDTH,
+          minHeight: ROLE_CARD_MIN_HEIGHT,
           width: "100%",
           height: "100%",
+          flexShrink: 0,
           display: "flex",
           flexDirection: "column",
           transition: 'all 0.2s ease-in-out',
