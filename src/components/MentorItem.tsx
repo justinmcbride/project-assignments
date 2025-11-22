@@ -1,14 +1,14 @@
 import { FC, useCallback } from "react";
 import { useDrag } from "react-dnd";
+import { Chip, ChipDelete } from "@mui/joy";
 
 import { ItemTypes } from "./ItemTypes";
-import { Chip, ChipDelete } from "@mui/joy";
-import Student from "@/types/Student";
+import Mentor from "@/types/Mentor";
 import Role from "@/types/Role";
 import { useAppState } from "@/AppContext";
 
 interface Props {
-  student: Student;
+  mentor: Mentor;
   parentRole?: Role;
 }
 
@@ -16,24 +16,24 @@ interface DropResult {
   role: Role;
 }
 
-export const StudentItem: FC<Props> = ({ student, parentRole }) => {
+export const MentorItem: FC<Props> = ({ mentor, parentRole }) => {
   const { dispatch } = useAppState();
 
-  const handleAddStudentToRole = useCallback(
-    (student: Student, role: Role) => {
-      dispatch({ type: "ADD_STUDENT_TO_ROLE", student, role });
+  const handleAddMentorToRole = useCallback(
+    (mentor: Mentor, role: Role) => {
+      dispatch({ type: "ADD_MENTOR_TO_ROLE", mentor, role });
     },
     [dispatch]
   );
 
   const handleRemoveFromRole = useCallback(() => {
     if (!parentRole) return;
-    dispatch({ type: "REMOVE_STUDENT_FROM_ROLE", student, role: parentRole });
-  }, [dispatch, parentRole, student]);
+    dispatch({ type: "REMOVE_MENTOR_FROM_ROLE", mentor, role: parentRole });
+  }, [dispatch, parentRole, mentor]);
 
   const [, drag] = useDrag(() => ({
-    type: ItemTypes.STUDENT,
-    item: student,
+    type: ItemTypes.MENTOR,
+    item: mentor,
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult<DropResult>();
       if (item && dropResult) {
@@ -42,13 +42,13 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
 
         if (draggingFromRole && destinationRole.name !== draggingFromRole.name) {
           dispatch({
-            type: "REMOVE_STUDENT_FROM_ROLE",
-            student,
+            type: "REMOVE_MENTOR_FROM_ROLE",
+            mentor,
             role: draggingFromRole,
           });
         }
 
-        handleAddStudentToRole(student, destinationRole);
+        handleAddMentorToRole(mentor, destinationRole);
       }
     },
     collect: (monitor) => ({
@@ -58,7 +58,21 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
   }));
 
   const rolesCountText =
-    student.roles.length > 1 ? ` (in ${student.roles.length} roles)` : "";
+    mentor.roles.length > 1 ? ` (in ${mentor.roles.length} roles)` : "";
+
+  const isUnassigned = mentor.roles.length === 0;
+  const isInMultipleRoles = mentor.roles.length > 1;
+
+  const chipVariant = isUnassigned
+    ? "outlined"
+    : isInMultipleRoles
+      ? "soft"
+      : "solid";
+  const chipColor = isUnassigned
+    ? "primary"
+    : isInMultipleRoles
+      ? "warning"
+      : "success";
 
   return (
     <div
@@ -69,14 +83,8 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
     >
       <Chip
         size="md"
-        variant={student.roles.length === 0 ? "outlined" : "solid"}
-        color={
-          student.roles.length === 0
-            ? "primary"
-            : student.roles.length > 1
-              ? "danger"
-              : "success"
-        }
+        variant={chipVariant}
+        color={chipColor}
         endDecorator={
           parentRole ? <ChipDelete onDelete={handleRemoveFromRole} /> : null
         }
@@ -87,7 +95,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
           "&:active": { cursor: "grabbing" },
         }}
       >
-        {student.name}
+        {mentor.name}
         {rolesCountText}
       </Chip>
     </div>

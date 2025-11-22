@@ -13,7 +13,9 @@ import { ItemTypes } from "./ItemTypes";
 import { useDrop } from "react-dnd";
 import Role from "@/types/Role";
 import Student from "@/types/Student";
+import Mentor from "@/types/Mentor";
 import { StudentItem } from "./StudentItem";
+import { MentorItem } from "./MentorItem";
 import { useAppState } from "@/AppContext";
 
 export const ROLE_CARD_MIN_WIDTH = 240;
@@ -24,38 +26,71 @@ interface Props {
 }
 
 export const RoleCard: FC<Props> = ({ role }) => {
-  const { name, description, desiredStudents, students: studentNames } = role;
+  const {
+    name,
+    description,
+    desiredStudents,
+    students: studentNames,
+    mentors: mentorNames,
+  } = role;
 
   const { state } = useAppState();
 
   const allStudents = state.students;
+  const allMentors = state.mentors;
   const students = useMemo(() => {
     return allStudents.filter((s) => studentNames.includes(s.name));
   }, [allStudents, studentNames]);
+  const mentors = useMemo(() => {
+    return allMentors.filter((m) => mentorNames.includes(m.name));
+  }, [allMentors, mentorNames]);
 
-  const [{ canDrop, isOver, draggedStudent }, drop] = useDrop(
+  const [{ canDrop, isOver, draggedItem, draggedType }, drop] = useDrop<
+    Student | Mentor,
+    { role: Role },
+    {
+      isOver: boolean;
+      canDrop: boolean;
+      draggedItem: Student | Mentor | null;
+      draggedType: string | null;
+    }
+  >(
     () => ({
-      accept: ItemTypes.BOX,
+      accept: [ItemTypes.STUDENT, ItemTypes.MENTOR],
       drop: () => {
-        console.log(`role ${role.name} dropped on`);
         return { role };
       },
-      canDrop: (item: Student) => {
-        const canDrop = !studentNames.includes(item.name);
-        return canDrop;
+      canDrop: (item, monitor) => {
+        const itemType = monitor.getItemType();
+        if (itemType === ItemTypes.STUDENT) {
+          return !studentNames.includes(item.name);
+        }
+        if (itemType === ItemTypes.MENTOR) {
+          return !mentorNames.includes(item.name);
+        }
+        return false;
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
         canDrop: monitor.canDrop(),
-        draggedStudent: monitor.getItem() as Student | null,
+        draggedItem: monitor.getItem() as Student | Mentor | null,
+        draggedType: monitor.getItemType() as string | null,
       }),
     }),
-    [role]
+    [role, studentNames, mentorNames]
   );
 
+  const isStudentDrag = draggedType === ItemTypes.STUDENT;
+  const isMentorDrag = draggedType === ItemTypes.MENTOR;
+  const draggedName = draggedItem?.name ?? "";
+
   const isActive = canDrop && isOver;
-  const isHoveringButCantDrop = !canDrop && isOver && draggedStudent;
-  const isAlreadyInRole = !!(isHoveringButCantDrop && studentNames.includes(draggedStudent?.name || ''));
+  const isHoveringButCantDrop = !canDrop && isOver && draggedItem;
+  const isAlreadyInRole = !!(
+    isHoveringButCantDrop &&
+    ((isStudentDrag && studentNames.includes(draggedName)) ||
+      (isMentorDrag && mentorNames.includes(draggedName)))
+  );
 
   const assignmentColor = 
     students.length === desiredStudents
@@ -65,7 +100,8 @@ export const RoleCard: FC<Props> = ({ role }) => {
         : "danger";
 
   // Calculate if the drop would exceed the limit
-  const wouldExceedLimit = isActive && students.length >= desiredStudents;
+  const wouldExceedLimit =
+    isActive && isStudentDrag && students.length >= desiredStudents;
 
   const setDropRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -144,7 +180,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
                   color: 'danger.600',
                 }}
               >
-                {draggedStudent?.name}
+                {draggedName}
               </Typography>
               <Typography 
                 level="body-md" 
@@ -222,6 +258,28 @@ export const RoleCard: FC<Props> = ({ role }) => {
               </Grid>
             )}
           </Grid>
+          <Divider sx={{ my: 1 }}>
+            <Typography level="body-xs" fontWeight="lg">Mentors</Typography>
+          </Divider>
+          <Grid container spacing={1} sx={{ minHeight: '60px', flex: 1, overflow: 'auto', width: '100%', maxWidth: '100%' }}>
+            {mentors.map((mentor) => (
+              <Grid xs="auto" key={mentor.name}>
+                <MentorItem mentor={mentor} parentRole={role} />
+              </Grid>
+            ))}
+            {mentors.length === 0 && (
+              <Grid xs={12}>
+                <Typography 
+                  level="body-sm" 
+                  textColor="text.tertiary" 
+                  textAlign="center"
+                  sx={{ py: 1.5 }}
+                >
+                  Drag mentors here
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
         </CardContent>
       )}
       <CardOverflow 
@@ -233,7 +291,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
         }}
       >
         <Divider inset="context" />
-        <CardContent orientation="horizontal" sx={{ py: 0.75 }}>
+        <CardContent orientation="horizontal" sx={{ py: 0.75, justifyContent: 'space-between', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
           <Typography
             level="body-xs"
             fontWeight="md"
@@ -243,6 +301,13 @@ export const RoleCard: FC<Props> = ({ role }) => {
             }}
           >
             {students.length} / {desiredStudents} student{desiredStudents !== 1 ? 's' : ''}
+          </Typography>
+          <Typography
+            level="body-xs"
+            fontWeight="md"
+            sx={{ color: mentors.length > 0 ? 'primary.600' : 'text.tertiary' }}
+          >
+            {mentors.length} mentor{mentors.length !== 1 ? 's' : ''}
           </Typography>
         </CardContent>
       </CardOverflow>

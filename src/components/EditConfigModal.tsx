@@ -35,6 +35,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import RestoreIcon from "@mui/icons-material/Restore";
 import UploadIcon from "@mui/icons-material/Upload";
 import DownloadIcon from "@mui/icons-material/Download";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 
 interface EditConfigModalProps {
   open: boolean;
@@ -54,6 +55,16 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
   const [showImportInput, setShowImportInput] = useState(false);
   const [importText, setImportText] = useState("");
   const [importError, setImportError] = useState("");
+
+  // Mentor editing state
+  const [newMentorName, setNewMentorName] = useState("");
+  const [editingMentor, setEditingMentor] = useState<string | null>(null);
+  const [editMentorName, setEditMentorName] = useState("");
+
+  // Import mentors state
+  const [showMentorImportInput, setShowMentorImportInput] = useState(false);
+  const [mentorImportText, setMentorImportText] = useState("");
+  const [mentorImportError, setMentorImportError] = useState("");
 
   // Role editing state
   const [newRole, setNewRole] = useState({
@@ -174,6 +185,104 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     }
   };
 
+  // Mentor handlers
+  const handleAddMentor = () => {
+    if (newMentorName.trim()) {
+      const isDuplicate = state.mentors.some(
+        (m) => m.name.toLowerCase() === newMentorName.trim().toLowerCase()
+      );
+
+      if (isDuplicate) {
+        alert(`A mentor named "${newMentorName.trim()}" already exists.`);
+        return;
+      }
+
+      dispatch({ type: "ADD_MENTOR", name: newMentorName.trim() });
+      setNewMentorName("");
+    }
+  };
+
+  const handleRemoveMentor = (name: string) => {
+    dispatch({ type: "REMOVE_MENTOR", name });
+  };
+
+  const handleStartEditMentor = (name: string) => {
+    setEditingMentor(name);
+    setEditMentorName(name);
+  };
+
+  const handleSaveMentor = () => {
+    if (editingMentor && editMentorName.trim()) {
+      if (editMentorName.trim() !== editingMentor) {
+        const isDuplicate = state.mentors.some(
+          (m) => m.name.toLowerCase() === editMentorName.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+          alert(`A mentor named "${editMentorName.trim()}" already exists.`);
+          return;
+        }
+      }
+
+      dispatch({
+        type: "UPDATE_MENTOR",
+        oldName: editingMentor,
+        newName: editMentorName.trim(),
+      });
+      setEditingMentor(null);
+      setEditMentorName("");
+    }
+  };
+
+  const handleCancelEditMentor = () => {
+    setEditingMentor(null);
+    setEditMentorName("");
+  };
+
+  const handleToggleMentorImport = () => {
+    setShowMentorImportInput(!showMentorImportInput);
+    setMentorImportText("");
+    setMentorImportError("");
+  };
+
+  const handleImportMentors = () => {
+    setMentorImportError("");
+
+    const mentorNames = mentorImportText
+      .split(",")
+      .map((name) => name.trim())
+      .filter((name) => name.length > 0);
+
+    if (mentorNames.length === 0) {
+      setMentorImportError("Please enter at least one mentor name");
+      return;
+    }
+
+    const uniqueNames = new Set(mentorNames);
+    if (uniqueNames.size !== mentorNames.length) {
+      setMentorImportError("Duplicate mentor names found in the list");
+      return;
+    }
+
+    const invalidNames = mentorNames.filter(
+      (name) => name.length < 1 || name.length > 100
+    );
+    if (invalidNames.length > 0) {
+      setMentorImportError("Some mentor names are too long or invalid");
+      return;
+    }
+
+    if (
+      confirm(
+        `This will replace all ${state.mentors.length} existing mentors with ${mentorNames.length} new mentors. All mentor assignments will be cleared. Continue?`
+      )
+    ) {
+      dispatch({ type: "IMPORT_MENTORS", mentors: mentorNames });
+      setMentorImportText("");
+      setShowMentorImportInput(false);
+    }
+  };
+
   // Role handlers
   const handleAddRole = () => {
     if (newRole.name.trim() && newRole.description.trim()) {
@@ -250,7 +359,7 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
   };
 
   const handleResetToDefaults = () => {
-    if (confirm("Are you sure you want to reset to default students and roles? This will clear all assignments and custom data.")) {
+    if (confirm("Are you sure you want to reset to default students, mentors, and roles? This will clear all assignments and custom data.")) {
       dispatch({ type: "RESET_STATE" });
     }
   };
@@ -259,6 +368,7 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     await exportAssignmentsToFile({
       roles: state.roles,
       students: state.students,
+      mentors: state.mentors,
     });
   };
 
@@ -300,6 +410,10 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
             <Tab>
               <PersonIcon sx={{ mr: 1 }} />
               Students ({state.students.length})
+            </Tab>
+            <Tab>
+              <SupervisorAccountIcon sx={{ mr: 1 }} />
+              Mentors ({state.mentors.length})
             </Tab>
             <Tab>
               <WorkIcon sx={{ mr: 1 }} />
@@ -425,8 +539,126 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
             </List>
           </TabPanel>
 
-          {/* Roles Tab */}
+          {/* Mentors Tab */}
           <TabPanel value={1} sx={{ p: 2 }}>
+            <div className="flex items-center justify-between mb-2">
+              <Typography level="title-md">
+                Add New Mentor
+              </Typography>
+              <Button
+                variant="soft"
+                color="warning"
+                startDecorator={<UploadIcon />}
+                onClick={handleToggleMentorImport}
+                size="sm"
+              >
+                {showMentorImportInput ? "Cancel Import" : "Import List"}
+              </Button>
+            </div>
+
+            {!showMentorImportInput ? (
+              <div className="flex gap-2 mb-4">
+                <Input
+                  placeholder="Mentor name"
+                  value={newMentorName}
+                  onChange={(e) => setNewMentorName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddMentor()}
+                  sx={{ flex: 1 }}
+                />
+                <Button
+                  startDecorator={<AddIcon />}
+                  onClick={handleAddMentor}
+                  disabled={!newMentorName.trim()}
+                >
+                  Add
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 mb-4">
+                <Textarea
+                  placeholder="Enter mentor names separated by commas"
+                  value={mentorImportText}
+                  onChange={(e) => setMentorImportText(e.target.value)}
+                  minRows={3}
+                  maxRows={6}
+                />
+                {mentorImportError && (
+                  <Alert color="danger" size="sm">
+                    {mentorImportError}
+                  </Alert>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    startDecorator={<UploadIcon />}
+                    onClick={handleImportMentors}
+                    disabled={!mentorImportText.trim()}
+                    color="success"
+                  >
+                    Import and Replace All
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={handleToggleMentorImport}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography level="title-md" sx={{ mb: 2 }}>
+              All Mentors
+            </Typography>
+            <List sx={{ maxHeight: 400, overflow: "auto" }}>
+              {state.mentors.map((mentor) => (
+                <ListItem key={mentor.name}>
+                  <ListItemDecorator>
+                    <SupervisorAccountIcon />
+                  </ListItemDecorator>
+                  {editingMentor === mentor.name ? (
+                    <ListItemContent sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Input
+                        value={editMentorName}
+                        onChange={(e) => setEditMentorName(e.target.value)}
+                        onKeyPress={(e) => e.key === "Enter" && handleSaveMentor()}
+                        sx={{ flex: 1 }}
+                        autoFocus
+                      />
+                      <IconButton size="sm" color="success" onClick={handleSaveMentor}>
+                        <SaveIcon />
+                      </IconButton>
+                      <IconButton size="sm" color="neutral" onClick={handleCancelEditMentor}>
+                        <CancelIcon />
+                      </IconButton>
+                    </ListItemContent>
+                  ) : (
+                    <>
+                      <ListItemContent>{mentor.name}</ListItemContent>
+                      <IconButton
+                        size="sm"
+                        color="neutral"
+                        onClick={() => handleStartEditMentor(mentor.name)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="sm"
+                        color="danger"
+                        onClick={() => handleRemoveMentor(mentor.name)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  )}
+                </ListItem>
+              ))}
+            </List>
+          </TabPanel>
+
+          {/* Roles Tab */}
+          <TabPanel value={2} sx={{ p: 2 }}>
             <Typography level="title-md" sx={{ mb: 2 }}>
               Add New Role
             </Typography>

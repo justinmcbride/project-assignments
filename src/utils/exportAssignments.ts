@@ -1,9 +1,11 @@
 import Role from "@/types/Role";
 import Student from "@/types/Student";
+import Mentor from "@/types/Mentor";
 
 interface ExportData {
   roles: Role[];
   students: Student[];
+  mentors: Mentor[];
 }
 
 interface FileSystemWritableFileStream {
@@ -27,7 +29,7 @@ type SaveFilePickerOptions = {
  * Generates formatted text content for role assignments
  */
 export function generateAssignmentsText(data: ExportData): string {
-  const { roles, students } = data;
+  const { roles, students, mentors } = data;
   
   let textContent = "PROJECT ROLE ASSIGNMENTS\n";
   textContent += "=".repeat(50) + "\n\n";
@@ -37,11 +39,15 @@ export function generateAssignmentsText(data: ExportData): string {
     const assignedStudents = students.filter((student) =>
       role.students.includes(student.name)
     );
+    const assignedMentors = mentors.filter((mentor) =>
+      (role.mentors || []).includes(mentor.name)
+    );
     
     textContent += `${role.name}\n`;
     textContent += "-".repeat(role.name.length) + "\n";
     textContent += `Description: ${role.description}\n`;
     textContent += `Capacity: ${assignedStudents.length} / ${role.desiredStudents} student${role.desiredStudents !== 1 ? 's' : ''}\n`;
+    textContent += `Mentors Present: ${assignedMentors.length}\n`;
     
     if (assignedStudents.length > 0) {
       textContent += "\nAssigned Students:\n";
@@ -50,6 +56,15 @@ export function generateAssignmentsText(data: ExportData): string {
       });
     } else {
       textContent += "\nNo students assigned yet.\n";
+    }
+
+    if (assignedMentors.length > 0) {
+      textContent += "\nAssigned Mentors:\n";
+      assignedMentors.forEach((mentor, index) => {
+        textContent += `  ${index + 1}. ${mentor.name}\n`;
+      });
+    } else {
+      textContent += "\nNo mentors assigned yet.\n";
     }
     
     textContent += "\n";
@@ -65,6 +80,19 @@ export function generateAssignmentsText(data: ExportData): string {
     textContent += "=".repeat(50) + "\n";
     unassignedStudents.forEach((student, index) => {
       textContent += `${index + 1}. ${student.name}\n`;
+    });
+    textContent += "\n";
+  }
+
+  const unassignedMentors = mentors.filter(
+    (mentor) => mentor.roles.length === 0
+  );
+
+  if (unassignedMentors.length > 0) {
+    textContent += "UNASSIGNED MENTORS\n";
+    textContent += "=".repeat(50) + "\n";
+    unassignedMentors.forEach((mentor, index) => {
+      textContent += `${index + 1}. ${mentor.name}\n`;
     });
     textContent += "\n";
   }
@@ -85,6 +113,20 @@ export function generateAssignmentsText(data: ExportData): string {
       textContent += "\n";
     });
   }
+
+  const multiRoleMentors = mentors.filter((mentor) => mentor.roles.length > 1);
+
+  if (multiRoleMentors.length > 0) {
+    textContent += "MENTORS IN MULTIPLE ROLES\n";
+    textContent += "=".repeat(50) + "\n";
+    multiRoleMentors.forEach((mentor) => {
+      textContent += `${mentor.name} (${mentor.roles.length} roles):\n`;
+      mentor.roles.forEach((role) => {
+        textContent += `  • ${role.name}\n`;
+      });
+      textContent += "\n";
+    });
+  }
   
   // Add summary
   textContent += "SUMMARY\n";
@@ -93,6 +135,9 @@ export function generateAssignmentsText(data: ExportData): string {
   textContent += `Total Students: ${students.length}\n`;
   textContent += `Assigned Students: ${students.filter(s => s.roles.length > 0).length}\n`;
   textContent += `Unassigned Students: ${unassignedStudents.length}\n`;
+  textContent += `Total Mentors: ${mentors.length}\n`;
+  textContent += `Assigned Mentors: ${mentors.filter(m => m.roles.length > 0).length}\n`;
+  textContent += `Unassigned Mentors: ${unassignedMentors.length}\n`;
   
   return textContent;
 }

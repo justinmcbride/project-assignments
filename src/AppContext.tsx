@@ -11,12 +11,15 @@ import {
   useRef,
 } from "react";
 import previewStudents from "./previewData/previewStudents";
+import previewMentors from "./previewData/previewMentors";
 import previewRoles from "@/previewData/previewRoles";
 import Student from "./types/Student";
+import Mentor from "./types/Mentor";
 import Role from "./types/Role";
 
 type InitialStateType = {
   students: Student[];
+  mentors: Mentor[];
   roles: Role[];
 };
 
@@ -34,7 +37,17 @@ const loadStateFromLocalStorage = (): InitialStateType | null => {
       const parsed = JSON.parse(savedState);
       // Validate that the parsed state has the expected structure
       if (parsed.students && parsed.roles && Array.isArray(parsed.students) && Array.isArray(parsed.roles)) {
-        return parsed;
+        const normalizedRoles = parsed.roles.map((role: Role) => ({
+          ...role,
+          students: Array.isArray(role.students) ? role.students : [],
+          mentors: Array.isArray(role.mentors) ? role.mentors : [],
+        }));
+
+        return {
+          students: parsed.students,
+          mentors: Array.isArray(parsed.mentors) ? parsed.mentors : previewMentors,
+          roles: normalizedRoles,
+        };
       }
     }
   } catch (error) {
@@ -57,23 +70,25 @@ const saveStateToLocalStorage = (state: InitialStateType) => {
 
 const initialState: InitialStateType = {
   students: previewStudents,
+  mentors: previewMentors,
   roles: previewRoles,
 };
 
 export const AppContext = createContext<{
   state: InitialStateType;
-  dispatch: Dispatch<StudentAction>;
+  dispatch: Dispatch<AppAction>;
 }>({
   state: initialState,
   dispatch: () => null,
 });
 
 const mainReducer = (
-  { students, roles }: InitialStateType,
-  action: StudentAction
-) => ({
-  students: studentsReducer(students, action),
-  roles: rolesReducer(roles, action),
+  state: InitialStateType,
+  action: AppAction
+): InitialStateType => ({
+  students: studentsReducer(state.students, action),
+  mentors: mentorsReducer(state.mentors, action),
+  roles: rolesReducer(state.roles, action),
 });
 
 export const AppProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -139,7 +154,7 @@ interface UpdateStudentAction {
 
 interface AddRoleAction {
   type: "ADD_ROLE";
-  role: Omit<Role, "students">;
+  role: Omit<Role, "students" | "mentors">;
 }
 
 interface RemoveRoleAction {
@@ -150,7 +165,7 @@ interface RemoveRoleAction {
 interface UpdateRoleAction {
   type: "UPDATE_ROLE";
   oldName: string;
-  role: Omit<Role, "students">;
+  role: Omit<Role, "students" | "mentors">;
 }
 
 interface ResetStateAction {
@@ -167,8 +182,41 @@ interface ImportStudentsAction {
   students: string[];
 }
 
-type StudentAction = 
-  | StudentAddToRoleAction 
+interface MentorAddToRoleAction {
+  type: "ADD_MENTOR_TO_ROLE";
+  mentor: Mentor;
+  role: Role;
+}
+
+interface MentorRemoveFromRoleAction {
+  type: "REMOVE_MENTOR_FROM_ROLE";
+  mentor: Mentor;
+  role: Role;
+}
+
+interface AddMentorAction {
+  type: "ADD_MENTOR";
+  name: string;
+}
+
+interface RemoveMentorAction {
+  type: "REMOVE_MENTOR";
+  name: string;
+}
+
+interface UpdateMentorAction {
+  type: "UPDATE_MENTOR";
+  oldName: string;
+  newName: string;
+}
+
+interface ImportMentorsAction {
+  type: "IMPORT_MENTORS";
+  mentors: string[];
+}
+
+type AppAction =
+  | StudentAddToRoleAction
   | StudentRemoveFromRoleAction
   | AddStudentAction
   | RemoveStudentAction
@@ -178,9 +226,15 @@ type StudentAction =
   | UpdateRoleAction
   | ResetStateAction
   | HydrateStateAction
-  | ImportStudentsAction;
+  | ImportStudentsAction
+  | MentorAddToRoleAction
+  | MentorRemoveFromRoleAction
+  | AddMentorAction
+  | RemoveMentorAction
+  | UpdateMentorAction
+  | ImportMentorsAction;
 
-const studentsReducer = (students: Student[], action: StudentAction) => {
+const studentsReducer = (students: Student[], action: AppAction) => {
   switch (action.type) {
     case "ADD_STUDENT_TO_ROLE":
       return students.map((s) =>
@@ -220,7 +274,48 @@ const studentsReducer = (students: Student[], action: StudentAction) => {
   }
 };
 
-const rolesReducer = (roles: Role[], action: StudentAction) => {
+const mentorsReducer = (mentors: Mentor[], action: AppAction) => {
+  switch (action.type) {
+    case "ADD_MENTOR_TO_ROLE":
+      return mentors.map((m) =>
+        m.name === action.mentor.name
+          ? {
+              ...m,
+              roles: m.roles.includes(action.role)
+                ? m.roles
+                : m.roles.concat(action.role),
+            }
+          : m
+      );
+    case "REMOVE_MENTOR_FROM_ROLE":
+      return mentors.map((m) =>
+        m.name === action.mentor.name
+          ? {
+              ...m,
+              roles: m.roles.filter((r) => r.name !== action.role.name),
+            }
+          : m
+      );
+    case "ADD_MENTOR":
+      return [...mentors, { name: action.name, roles: [] }];
+    case "REMOVE_MENTOR":
+      return mentors.filter((m) => m.name !== action.name);
+    case "UPDATE_MENTOR":
+      return mentors.map((m) =>
+        m.name === action.oldName ? { ...m, name: action.newName } : m
+      );
+    case "RESET_STATE":
+      return previewMentors;
+    case "HYDRATE_STATE":
+      return action.payload.mentors;
+    case "IMPORT_MENTORS":
+      return action.mentors.map((name) => ({ name, roles: [] }));
+    default:
+      return mentors;
+  }
+};
+
+const rolesReducer = (roles: Role[], action: AppAction) => {
   switch (action.type) {
     case "ADD_STUDENT_TO_ROLE":
       return roles.map((r) =>
@@ -255,22 +350,53 @@ const rolesReducer = (roles: Role[], action: StudentAction) => {
         ),
       }));
     case "ADD_ROLE":
-      return [...roles, { ...action.role, students: [] }];
+      return [...roles, { ...action.role, students: [], mentors: [] }];
     case "REMOVE_ROLE":
       return roles.filter((r) => r.name !== action.name);
     case "UPDATE_ROLE":
       return roles.map((r) =>
         r.name === action.oldName
-          ? { ...action.role, students: r.students }
+          ? { ...action.role, students: r.students, mentors: r.mentors }
           : r
       );
     case "RESET_STATE":
       return previewRoles;
     case "HYDRATE_STATE":
-      return action.payload.roles;
+      return action.payload.roles.map((role) => ({
+        ...role,
+        students: Array.isArray(role.students) ? role.students : [],
+        mentors: Array.isArray(role.mentors) ? role.mentors : [],
+      }));
     case "IMPORT_STUDENTS":
       // Clear all student assignments from roles when importing new students
       return roles.map((r) => ({ ...r, students: [] }));
+    case "ADD_MENTOR_TO_ROLE":
+      return roles.map((r) =>
+        r.name === action.role.name
+          ? {
+              ...r,
+              mentors: r.mentors.includes(action.mentor.name)
+                ? r.mentors
+                : r.mentors.concat(action.mentor.name),
+            }
+          : r
+      );
+    case "REMOVE_MENTOR_FROM_ROLE":
+      return roles.map((r) =>
+        r.name === action.role.name
+          ? {
+              ...r,
+              mentors: r.mentors.filter((m) => m !== action.mentor.name),
+            }
+          : r
+      );
+    case "REMOVE_MENTOR":
+      return roles.map((r) => ({
+        ...r,
+        mentors: r.mentors.filter((m) => m !== action.name),
+      }));
+    case "IMPORT_MENTORS":
+      return roles.map((r) => ({ ...r, mentors: [] }));
     default:
       return roles;
   }

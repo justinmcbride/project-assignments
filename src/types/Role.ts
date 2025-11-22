@@ -3,4 +3,5 @@ export default interface Role {
   description: string;
   desiredStudents: number;
   students: string[];
+  mentors: string[];
 }

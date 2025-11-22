@@ -5,6 +5,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RoleCard, ROLE_CARD_MIN_HEIGHT, ROLE_CARD_MIN_WIDTH } from "@/components/RoleCard";
 import { StudentItem } from "@/components/StudentItem";
+import { MentorItem } from "@/components/MentorItem";
 import { EditConfigModal } from "@/components/EditConfigModal";
 import { Divider, Grid, Typography, Button } from "@mui/joy";
 import { useAppState } from "@/AppContext";
@@ -14,6 +15,7 @@ const MainComponent = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   const students = state.students;
+  const mentors = state.mentors;
   const roles = state.roles;
 
   return (
@@ -63,7 +65,7 @@ const MainComponent = () => {
             </div>
           </section>
 
-          {/* Students column */}
+          {/* Students & mentors column */}
           <aside
             className="bg-white rounded-l-lg rounded-r-none shadow-md px-3 py-2 flex flex-col h-full"
             style={{
@@ -72,21 +74,35 @@ const MainComponent = () => {
               minHeight: 0,
             }}
           >
-            <div className="flex items-center justify-between mb-2">
-              <Divider sx={{ flex: 1 }}>
-                <Typography level="title-lg" sx={{ color: "primary.600" }}>
-                  All Students
-                </Typography>
-              </Divider>
-            </div>
-            <div style={{ overflowY: "auto", paddingRight: "0.25rem", flex: 1 }}>
-              <Grid container spacing={0.5}>
-                {students.map((student) => (
-                  <Grid xs={12} key={student.name}>
-                    <StudentItem student={student} />
-                  </Grid>
-                ))}
-              </Grid>
+            <div style={{ overflowY: "auto", paddingRight: "0.25rem", flex: 1, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <section>
+                <Divider sx={{ mb: 1 }}>
+                  <Typography level="title-lg" sx={{ color: "primary.600" }}>
+                    Students ({students.length})
+                  </Typography>
+                </Divider>
+                <Grid container spacing={0.5}>
+                  {students.map((student) => (
+                    <Grid xs={12} key={student.name}>
+                      <StudentItem student={student} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </section>
+              <section>
+                <Divider sx={{ mb: 1 }}>
+                  <Typography level="title-lg" sx={{ color: "warning.600" }}>
+                    Mentors ({mentors.length})
+                  </Typography>
+                </Divider>
+                <Grid container spacing={0.5}>
+                  {mentors.map((mentor) => (
+                    <Grid xs={12} key={mentor.name}>
+                      <MentorItem mentor={mentor} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </section>
             </div>
           </aside>
         </div>
