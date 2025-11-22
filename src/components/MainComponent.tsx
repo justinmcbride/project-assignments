@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { RoleCard, ROLE_CARD_MIN_HEIGHT, ROLE_CARD_MIN_WIDTH } from "@/components/RoleCard";
@@ -8,109 +8,87 @@ import { StudentItem } from "@/components/StudentItem";
 import { EditConfigModal } from "@/components/EditConfigModal";
 import { Divider, Grid, Typography, Button } from "@mui/joy";
 import { useAppState } from "@/AppContext";
-import SettingsIcon from "@mui/icons-material/Settings";
 
 const MainComponent = () => {
   const { state } = useAppState();
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const mainRef = useRef<HTMLElement | null>(null);
 
   const students = state.students;
   const roles = state.roles;
 
-  useEffect(() => {
-    const checkOverflow = () => {
-      const container = mainRef.current;
-      if (!container) {
-        return;
-      }
-      setIsOverflowing(container.scrollHeight - container.clientHeight > 1);
-    };
-
-    checkOverflow();
-
-    const container = mainRef.current;
-    if (!container) {
-      return;
-    }
-
-    const handleResize = () => checkOverflow();
-
-    let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(() => checkOverflow());
-      resizeObserver.observe(container);
-    }
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      resizeObserver?.disconnect();
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [students.length, roles.length]);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <main
-        ref={mainRef}
-        className="w-full flex flex-col"
-        style={{
-          height: "calc(100vh - 10rem)",
-          overflowY: isOverflowing ? "auto" : "hidden",
-          overflowX: "hidden",
-        }}
+        className="w-full flex flex-col flex-1"
+        style={{ minHeight: "calc(100vh - 10rem)" }}
       >
-        {/* Students section at the top */}
-        <div className="bg-white rounded-lg shadow-md p-3 mb-4" style={{ flexShrink: 0 }}>
-          <div className="flex items-center justify-between mb-2">
-            <Divider sx={{ flex: 1 }}>
-              <Typography level="title-lg" sx={{ color: "primary.600" }}>
-                All Students
-              </Typography>
-            </Divider>
-            <Button
-              variant="soft"
-              color="primary"
-              startDecorator={<SettingsIcon />}
-              onClick={() => setEditModalOpen(true)}
-              sx={{ ml: 2 }}
-            >
-              Edit Config
-            </Button>
-          </div>
-          <Grid container spacing={1}>
-            {students.map((student) => (
-              <Grid xs="auto" key={student.name}>
-                <StudentItem student={student} />
-              </Grid>
-            ))}
-          </Grid>
+        <div className="flex items-center justify-between mb-3">
+          <Typography level="title-md" sx={{ fontWeight: 600 }}>
+            Assignments Overview
+          </Typography>
+          <Button
+            variant="outlined"
+            size="sm"
+            color="neutral"
+            onClick={() => setEditModalOpen(true)}
+          >
+            Edit Config
+          </Button>
         </div>
-        
-        {/* Roles grid - fixed 2 rows x 4 columns */}
-        <div
-          style={{
-            flex: 1,
-            display: "grid",
-            gridTemplateColumns: `repeat(4, minmax(${ROLE_CARD_MIN_WIDTH}px, 1fr))`,
-            gridTemplateRows: `repeat(2, minmax(${ROLE_CARD_MIN_HEIGHT}px, 1fr))`,
-            gap: "1rem",
-            minHeight: 0,
-          }}
-        >
-          {roles.map((role) => (
+
+        <div className="flex flex-1 gap-3 min-h-0 items-stretch">
+          {/* Roles grid - fixed 2 rows x 4 columns */}
+          <section className="flex-1 min-w-0 flex flex-col min-h-0">
             <div
-              key={role.name}
               style={{
-                minWidth: ROLE_CARD_MIN_WIDTH,
-                minHeight: ROLE_CARD_MIN_HEIGHT,
+                flex: 1,
+                display: "grid",
+                gridTemplateColumns: `repeat(4, minmax(${ROLE_CARD_MIN_WIDTH}px, 1fr))`,
+                gridTemplateRows: `repeat(2, minmax(${ROLE_CARD_MIN_HEIGHT}px, 1fr))`,
+                gap: "1rem",
+                minHeight: 0,
               }}
             >
-              <RoleCard role={role} />
+              {roles.map((role) => (
+                <div
+                  key={role.name}
+                  style={{
+                    minWidth: ROLE_CARD_MIN_WIDTH,
+                    minHeight: ROLE_CARD_MIN_HEIGHT,
+                  }}
+                >
+                  <RoleCard role={role} />
+                </div>
+              ))}
             </div>
-          ))}
+          </section>
+
+          {/* Students column */}
+          <aside
+            className="bg-white rounded-l-lg rounded-r-none shadow-md px-3 py-2 flex flex-col h-full"
+            style={{
+              width: "18rem",
+              flexShrink: 0,
+              minHeight: 0,
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Divider sx={{ flex: 1 }}>
+                <Typography level="title-lg" sx={{ color: "primary.600" }}>
+                  All Students
+                </Typography>
+              </Divider>
+            </div>
+            <div style={{ overflowY: "auto", paddingRight: "0.25rem", flex: 1 }}>
+              <Grid container spacing={0.5}>
+                {students.map((student) => (
+                  <Grid xs={12} key={student.name}>
+                    <StudentItem student={student} />
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
+          </aside>
         </div>
       </main>
 

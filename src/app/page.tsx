@@ -10,7 +10,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <AppProvider>
-        <div className="container mx-auto px-3 py-6 max-w-[1600px]">
+        <div className="container mx-auto pl-3 pr-0 py-6 max-w-[1600px]">
           <div className="flex items-center justify-center gap-4 mb-3">
             <Image 
               src="/voc.png" 
