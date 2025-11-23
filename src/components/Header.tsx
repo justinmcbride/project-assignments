@@ -1,5 +1,6 @@
 import { Typography } from "@mui/joy";
 import Image from "next/image";
+import { ConfigButton } from "@/components/ConfigButton";
 
 export const Header = () => {
   return (
@@ -31,6 +32,10 @@ export const Header = () => {
         className="h-auto opacity-80"
         style={{ maxHeight: "4rem" }}
       />
+      
+      <div style={{ position: "absolute", right: "1.5rem" }}>
+        <ConfigButton />
+      </div>
     </header>
   );
 };
