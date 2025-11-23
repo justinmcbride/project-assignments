@@ -24,7 +24,7 @@ import {
   Alert,
 } from "@mui/joy";
 import { useAppState } from "@/AppContext";
-import { exportAssignmentsToFile } from "@/utils/exportAssignments";
+import { exportAssignmentsToFile, exportConfigToJSON, importConfigFromJSON } from "@/utils/exportAssignments";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
@@ -372,19 +372,38 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
     });
   };
 
+  const handleExportConfig = async () => {
+    await exportConfigToJSON({
+      roles: state.roles,
+      students: state.students,
+      mentors: state.mentors,
+    });
+  };
+
+  const handleImportConfig = async () => {
+    const data = await importConfigFromJSON();
+    if (data) {
+      if (confirm(
+        `This will replace all current data with the imported configuration. This includes:\n\n` +
+        `• ${data.students.length} students\n` +
+        `• ${data.mentors.length} mentors\n` +
+        `• ${data.roles.length} roles\n\n` +
+        `Continue?`
+      )) {
+        dispatch({ type: "LOAD_STATE", payload: data });
+      }
+    }
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <ModalDialog sx={{ width: "90vw", maxWidth: 800, maxHeight: "90vh", overflow: "auto" }}>
         <ModalClose />
         <Typography level="h4" sx={{ mb: 1 }}>
-          Configure Students and Roles
-        </Typography>
-        
-        <Typography level="body-sm" sx={{ mb: 2, fontStyle: "italic", color: "text.tertiary" }}>
-          💾 All changes are automatically saved to your browser
+          Configuration
         </Typography>
 
-        <div className="flex justify-center gap-2 mb-3">
+        <div className="flex justify-center gap-2 mb-3 flex-wrap">
           <Button
             variant="outlined"
             color="success"
@@ -392,7 +411,25 @@ export const EditConfigModal = ({ open, onClose }: EditConfigModalProps) => {
             onClick={handleExportToText}
             size="sm"
           >
-            Export assignments
+            Export Report
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            startDecorator={<DownloadIcon />}
+            onClick={handleExportConfig}
+            size="sm"
+          >
+            Export Config
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            startDecorator={<UploadIcon />}
+            onClick={handleImportConfig}
+            size="sm"
+          >
+            Import Config
           </Button>
           <Button
             variant="outlined"

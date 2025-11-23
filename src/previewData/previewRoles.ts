@@ -4,7 +4,7 @@ const roles: Role[] = [
   {
     name: "Communication Team",
     description:
-      "Create pre and post emails for volunteers and manage check-in table",
+      "Draft event email for volunteers and manage check-in table",
     desiredStudents: 2,
     students: [],
     mentors: [],
@@ -19,15 +19,15 @@ const roles: Role[] = [
   {
     name: "Technical Advisory Team",
     description:
-      "Prepare technical notes needed for project and create tool list",
-    desiredStudents: 2,
+      "Prepare project work notes and measure accomplishments",
+    desiredStudents: 3,
     students: [],
     mentors: [],
   },
   {
     name: "Tool Manager Team",
-    description: "Load/unload tools for project and keep track of tool count",
-    desiredStudents: 2,
+    description: "Create tool list and load/unload tools for project",
+    desiredStudents: 3,
     students: [],
     mentors: [],
   },
@@ -48,18 +48,32 @@ const roles: Role[] = [
     mentors: [],
   },
   {
-    name: "Community Lead",
+    name: "Community Team",
     description:
-      "Plan and lead warm-up activity, thank volunteers before & after project",
-    desiredStudents: 1,
+      "Conduct welcome and closing speech, talk about impact of project",
+    desiredStudents: 2,
     students: [],
     mentors: [],
   },
   {
-    name: "Photography Lead",
+    name: "Photography Team",
     description:
-      "Capture photos throughout the event and upload pictures to Google Photos",
-    desiredStudents: 1,
+      "Capture photos throughout the event and upload pictures afterwards",
+    desiredStudents: 2,
+    students: [],
+    mentors: [],
+  },
+  {
+    name: "Recruitment Team",
+    description: "Create flyer to invite friends & family to project",
+    desiredStudents: 2,
+    students: [],
+    mentors: [],
+  },
+  {
+    name: "Celebration Team",
+    description: "Plan our end-of-program graduation, get creative!",
+    desiredStudents: 3,
     students: [],
     mentors: [],
   },

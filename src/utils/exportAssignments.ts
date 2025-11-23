@@ -190,3 +190,99 @@ export async function exportAssignmentsToFile(data: ExportData): Promise<void> {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Exports the entire state configuration as a JSON file
+ */
+export async function exportConfigToJSON(data: ExportData): Promise<void> {
+  const jsonContent = JSON.stringify(data, null, 2);
+  type ShowSaveFilePicker = (options?: SaveFilePickerOptions) => Promise<FileSystemFileHandle>;
+  interface WindowWithSaveFilePicker extends Window {
+    showSaveFilePicker?: ShowSaveFilePicker;
+  }
+  const fsWindow = window as WindowWithSaveFilePicker;
+  
+  // Try to use the File System Access API (shows save dialog)
+  try {
+    if (typeof fsWindow.showSaveFilePicker === "function") {
+      const handle = await fsWindow.showSaveFilePicker({
+        suggestedName: 'project-config.json',
+        types: [
+          {
+            description: 'JSON Files',
+            accept: { 'application/json': ['.json'] },
+          },
+        ],
+      });
+      
+      const writable = await handle.createWritable();
+      await writable.write(jsonContent);
+      await writable.close();
+      return;
+    }
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') {
+      return; // User cancelled
+    }
+  }
+  
+  // Fallback for browsers that don't support File System Access API
+  const blob = new Blob([jsonContent], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "project-config.json";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Imports configuration from a JSON file
+ * Returns the parsed data or null if cancelled/error
+ */
+export async function importConfigFromJSON(): Promise<ExportData | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json,.json";
+    
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text) as ExportData;
+        
+        // Validate the structure
+        if (!data.students || !data.roles || !Array.isArray(data.students) || !Array.isArray(data.roles)) {
+          alert("Invalid config file: Missing required fields (students, roles)");
+          resolve(null);
+          return;
+        }
+        
+        // Ensure mentors exists (backwards compatibility)
+        if (!data.mentors || !Array.isArray(data.mentors)) {
+          data.mentors = [];
+        }
+        
+        resolve(data);
+      } catch (err) {
+        alert("Error reading config file: " + (err as Error).message);
+        resolve(null);
+      }
+    };
+    
+    input.oncancel = () => {
+      resolve(null);
+    };
+    
+    input.click();
+  });
+}
+

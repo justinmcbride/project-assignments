@@ -9,6 +9,7 @@ import {
   useReducer,
   useEffect,
   useRef,
+  useState,
 } from "react";
 import previewStudents from "./previewData/previewStudents";
 import previewMentors from "./previewData/previewMentors";
@@ -68,18 +69,21 @@ const saveStateToLocalStorage = (state: InitialStateType) => {
   }
 };
 
-const initialState: InitialStateType = {
-  students: previewStudents,
-  mentors: previewMentors,
-  roles: previewRoles,
+// Empty initial state for loading phase
+const emptyState: InitialStateType = {
+  students: [],
+  mentors: [],
+  roles: [],
 };
 
 export const AppContext = createContext<{
   state: InitialStateType;
   dispatch: Dispatch<AppAction>;
+  isLoading: boolean;
 }>({
-  state: initialState,
+  state: emptyState,
   dispatch: () => null,
+  isLoading: true,
 });
 
 const mainReducer = (
@@ -92,29 +96,68 @@ const mainReducer = (
 });
 
 export const AppProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [state, dispatch] = useReducer(mainReducer, initialState);
-  const hasHydratedRef = useRef(false);
+  // Start with empty state
+  const [state, dispatch] = useReducer(mainReducer, emptyState);
+  const [isLoading, setIsLoading] = useState(true);
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const hasInitializedRef = useRef(false);
 
-  // Load from localStorage after hydration
+  // Initialize state on mount
   useEffect(() => {
-    const savedState = loadStateFromLocalStorage();
-    if (savedState) {
-      // Dispatch actions to update state with saved data
-      dispatch({ type: "HYDRATE_STATE", payload: savedState });
-    }
-    hasHydratedRef.current = true;
+    const initializeState = () => {
+      const savedState = loadStateFromLocalStorage();
+      
+      if (savedState) {
+        // Load existing saved data
+        dispatch({ type: "LOAD_STATE", payload: savedState });
+      } else {
+        // First-time user: populate with preview data
+        dispatch({ type: "LOAD_STATE", payload: {
+          students: previewStudents,
+          mentors: previewMentors,
+          roles: previewRoles,
+        }});
+      }
+      
+      setIsLoading(false);
+      hasInitializedRef.current = true;
+    };
+
+    initializeState();
+
+    return () => {
+      // Clear any pending saves on unmount
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, []);
 
-  // Save to localStorage whenever state changes (but only after hydration)
+  // Debounced save to localStorage whenever state changes (after initialization)
   useEffect(() => {
-    if (!hasHydratedRef.current) {
+    if (!hasInitializedRef.current) {
       return;
     }
-    saveStateToLocalStorage(state);
+
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Debounce saves to prevent rapid writes during state transitions
+    saveTimeoutRef.current = setTimeout(() => {
+      saveStateToLocalStorage(state);
+    }, 500); // 500ms debounce
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [state]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, isLoading }}>
       {children}
     </AppContext.Provider>
   );
@@ -172,8 +215,8 @@ interface ResetStateAction {
   type: "RESET_STATE";
 }
 
-interface HydrateStateAction {
-  type: "HYDRATE_STATE";
+interface LoadStateAction {
+  type: "LOAD_STATE";
   payload: InitialStateType;
 }
 
@@ -225,7 +268,7 @@ type AppAction =
   | RemoveRoleAction
   | UpdateRoleAction
   | ResetStateAction
-  | HydrateStateAction
+  | LoadStateAction
   | ImportStudentsAction
   | MentorAddToRoleAction
   | MentorRemoveFromRoleAction
@@ -265,7 +308,7 @@ const studentsReducer = (students: Student[], action: AppAction) => {
       );
     case "RESET_STATE":
       return previewStudents;
-    case "HYDRATE_STATE":
+    case "LOAD_STATE":
       return action.payload.students;
     case "IMPORT_STUDENTS":
       return action.students.map((name) => ({ name, roles: [] }));
@@ -306,7 +349,7 @@ const mentorsReducer = (mentors: Mentor[], action: AppAction) => {
       );
     case "RESET_STATE":
       return previewMentors;
-    case "HYDRATE_STATE":
+    case "LOAD_STATE":
       return action.payload.mentors;
     case "IMPORT_MENTORS":
       return action.mentors.map((name) => ({ name, roles: [] }));
@@ -361,7 +404,7 @@ const rolesReducer = (roles: Role[], action: AppAction) => {
       );
     case "RESET_STATE":
       return previewRoles;
-    case "HYDRATE_STATE":
+    case "LOAD_STATE":
       return action.payload.roles.map((role) => ({
         ...role,
         students: Array.isArray(role.students) ? role.students : [],
