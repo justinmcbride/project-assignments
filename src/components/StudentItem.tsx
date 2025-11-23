@@ -2,7 +2,7 @@ import { FC, useCallback } from "react";
 import { useDrag } from "react-dnd";
 
 import { ItemTypes } from "./ItemTypes";
-import { Chip, ChipDelete } from "@mui/joy";
+import { Chip, ChipDelete, Avatar } from "@mui/joy";
 import Student from "@/types/Student";
 import Role from "@/types/Role";
 import { useAppState } from "@/AppContext";
@@ -77,6 +77,9 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
               ? "danger"
               : "success"
         }
+        startDecorator={
+          <Avatar size="sm" src={`https://api.dicebear.com/7.x/initials/svg?seed=${student.name}&chars=1`} />
+        }
         endDecorator={
           parentRole ? <ChipDelete onDelete={handleRemoveFromRole} /> : null
         }
@@ -84,6 +87,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
           cursor: "grab",
           transition: "all 0.2s ease-in-out",
           "&:active": { cursor: "grabbing" },
+          "--Chip-radius": "20px",
         }}
       >
         {student.name}

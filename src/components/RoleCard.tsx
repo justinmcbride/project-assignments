@@ -5,6 +5,7 @@ import {
   Divider,
   Grid,
   Typography,
+  LinearProgress,
 } from "@mui/joy";
 import { FC, useCallback, useMemo } from "react";
 
@@ -148,7 +149,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
             ? (isAlreadyInRole || wouldExceedLimit
                 ? 'linear-gradient(135deg, rgba(211, 47, 47, 0.12) 0%, rgba(211, 47, 47, 0.04) 50%, transparent 100%)'
                 : 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%)')
-            : 'rgba(255, 255, 255, 0.8)',
+            : 'linear-gradient(135deg, rgba(224, 231, 255, 0.6) 0%, rgba(238, 242, 255, 0.4) 100%)',
           backdropFilter: 'blur(8px)',
           boxShadow: (isActive || isAlreadyInRole) ? 'md' : 'sm',
           '&:hover': {
@@ -191,20 +192,31 @@ export const RoleCard: FC<Props> = ({ role }) => {
           </Typography>
 
           {/* Students Section */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-            <Typography level="body-xs" fontWeight="lg" sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
-              Students
-            </Typography>
-            <Typography 
-              level="body-xs" 
-              fontWeight="md"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography level="body-xs" fontWeight="lg" sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
+                Students
+              </Typography>
+              <Typography 
+                level="body-xs" 
+                fontWeight="md"
+                sx={{ 
+                  fontSize: '0.7rem',
+                  color: assignmentColor === 'danger' ? 'danger.600' : assignmentColor === 'success' ? 'success.600' : 'text.secondary',
+                }}
+              >
+                {students.length}/{desiredStudents}
+              </Typography>
+            </div>
+            <LinearProgress
+              determinate
+              value={Math.min((students.length / desiredStudents) * 100, 100)}
+              color={assignmentColor === 'danger' ? 'danger' : assignmentColor === 'success' ? 'success' : 'neutral'}
               sx={{ 
-                fontSize: '0.7rem',
-                color: assignmentColor === 'danger' ? 'danger.600' : assignmentColor === 'success' ? 'success.600' : 'text.secondary',
+                bgcolor: 'background.level2',
+                color: assignmentColor === 'danger' ? 'danger.500' : assignmentColor === 'success' ? 'success.500' : 'neutral.400',
               }}
-            >
-              {students.length}/{desiredStudents}
-            </Typography>
+            />
           </div>
           
           <Grid

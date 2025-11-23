@@ -12,11 +12,12 @@ interface PeopleSidebarProps {
 export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
   return (
     <aside
-      className="bg-white/80 backdrop-blur-md border-l border-gray-200 p-4 flex flex-col h-full overflow-hidden shadow-sm"
+      className="p-4 flex flex-col h-full overflow-hidden"
       style={{
         width: "100%",
         flexShrink: 0,
         minHeight: 0,
+        backdropFilter: "blur(10px)",
       }}
     >
       <div style={{ overflowY: "auto", paddingRight: "0.25rem", flex: 1, display: "flex", flexDirection: "column", gap: "1.25rem" }}>

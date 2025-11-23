@@ -1,6 +1,6 @@
 import { FC, useCallback } from "react";
 import { useDrag } from "react-dnd";
-import { Chip, ChipDelete } from "@mui/joy";
+import { Chip, ChipDelete, Avatar } from "@mui/joy";
 
 import { ItemTypes } from "./ItemTypes";
 import Mentor from "@/types/Mentor";
@@ -85,6 +85,9 @@ export const MentorItem: FC<Props> = ({ mentor, parentRole }) => {
         size="md"
         variant={chipVariant}
         color={chipColor}
+        startDecorator={
+          <Avatar size="sm" src={`https://api.dicebear.com/7.x/initials/svg?seed=${mentor.name}&chars=1`} />
+        }
         endDecorator={
           parentRole ? <ChipDelete onDelete={handleRemoveFromRole} /> : null
         }
@@ -92,6 +95,7 @@ export const MentorItem: FC<Props> = ({ mentor, parentRole }) => {
           cursor: "grab",
           transition: "all 0.2s ease-in-out",
           "&:active": { cursor: "grabbing" },
+          "--Chip-radius": "20px",
         }}
       >
         {mentor.name}
