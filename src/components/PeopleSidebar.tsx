@@ -10,6 +10,14 @@ interface PeopleSidebarProps {
 }
 
 export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
+  // Partition students into unassigned and assigned based on their roles array
+  const unassignedStudents = students.filter(student => student.roles.length === 0);
+  const assignedStudents = students.filter(student => student.roles.length > 0);
+
+  // Partition mentors into unassigned and assigned based on their roles array
+  const unassignedMentors = mentors.filter(mentor => mentor.roles.length === 0);
+  const assignedMentors = mentors.filter(mentor => mentor.roles.length > 0);
+
   return (
     <aside
       className="p-4 flex flex-col h-full overflow-hidden"
@@ -27,27 +35,78 @@ export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
               Students ({students.length})
             </Typography>
           </Divider>
-          <Grid container spacing={0.5}>
-            {students.map((student) => (
-              <Grid key={student.name}>
-                <StudentItem student={student} />
+          
+          {/* Unassigned Students */}
+          {unassignedStudents.length > 0 && (
+            <>
+              <Typography level="body-sm" sx={{ mb: 0.5, mt: 0.5, opacity: 0.7 }}>
+                Unassigned ({unassignedStudents.length})
+              </Typography>
+              <Grid container spacing={0.5} sx={{ mb: 1 }}>
+                {unassignedStudents.map((student) => (
+                  <Grid key={student.name}>
+                    <StudentItem student={student} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
+            </>
+          )}
+          
+          {/* Assigned Students */}
+          {assignedStudents.length > 0 && (
+            <>
+              <Typography level="body-sm" sx={{ mb: 0.5, mt: unassignedStudents.length > 0 ? 1 : 0.5, opacity: 0.7 }}>
+                Assigned ({assignedStudents.length})
+              </Typography>
+              <Grid container spacing={0.5}>
+                {assignedStudents.map((student) => (
+                  <Grid key={student.name}>
+                    <StudentItem student={student} />
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          )}
         </section>
+        
         <section>
           <Divider sx={{ mb: 1 }}>
             <Typography level="title-lg" sx={{ color: "warning.600" }}>
               Mentors ({mentors.length})
             </Typography>
           </Divider>
-          <Grid container spacing={0.5}>
-            {mentors.map((mentor) => (
-              <Grid key={mentor.name}>
-                <MentorItem mentor={mentor} />
+          
+          {/* Unassigned Mentors */}
+          {unassignedMentors.length > 0 && (
+            <>
+              <Typography level="body-sm" sx={{ mb: 0.5, mt: 0.5, opacity: 0.7 }}>
+                Unassigned ({unassignedMentors.length})
+              </Typography>
+              <Grid container spacing={0.5} sx={{ mb: 1 }}>
+                {unassignedMentors.map((mentor) => (
+                  <Grid key={mentor.name}>
+                    <MentorItem mentor={mentor} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
+            </>
+          )}
+          
+          {/* Assigned Mentors */}
+          {assignedMentors.length > 0 && (
+            <>
+              <Typography level="body-sm" sx={{ mb: 0.5, mt: unassignedMentors.length > 0 ? 1 : 0.5, opacity: 0.7 }}>
+                Assigned ({assignedMentors.length})
+              </Typography>
+              <Grid container spacing={0.5}>
+                {assignedMentors.map((mentor) => (
+                  <Grid key={mentor.name}>
+                    <MentorItem mentor={mentor} />
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          )}
         </section>
       </div>
     </aside>
