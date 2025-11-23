@@ -236,7 +236,18 @@ export const RoleCard: FC<Props> = ({ role }) => {
           <Divider sx={{ my: 1 }}>
             <Typography level="body-xs" fontWeight="lg">Students</Typography>
           </Divider>
-          <Grid container spacing={1} sx={{ minHeight: '60px', flex: 1, overflow: 'auto', width: '100%', maxWidth: '100%' }}>
+          <Grid
+            container
+            spacing={0.5}
+            sx={{
+              minHeight: '48px',
+              flex: 1,
+              overflow: 'auto',
+              width: '100%',
+              maxWidth: '100%',
+              alignContent: 'flex-start',
+            }}
+          >
             {students.map((student) => (
               <Grid xs="auto" key={student.name}>
                 <StudentItem
@@ -251,7 +262,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
                   level="body-sm" 
                   textColor="text.tertiary" 
                   textAlign="center"
-                  sx={{ py: 1.5 }}
+                  sx={{ py: 1 }}
                 >
                   Drag students here
                 </Typography>
@@ -261,7 +272,18 @@ export const RoleCard: FC<Props> = ({ role }) => {
           <Divider sx={{ my: 1 }}>
             <Typography level="body-xs" fontWeight="lg">Mentors</Typography>
           </Divider>
-          <Grid container spacing={1} sx={{ minHeight: '60px', flex: 1, overflow: 'auto', width: '100%', maxWidth: '100%' }}>
+          <Grid
+            container
+            spacing={0.5}
+            sx={{
+              minHeight: '48px',
+              flex: 1,
+              overflow: 'auto',
+              width: '100%',
+              maxWidth: '100%',
+              alignContent: 'flex-start',
+            }}
+          >
             {mentors.map((mentor) => (
               <Grid xs="auto" key={mentor.name}>
                 <MentorItem mentor={mentor} parentRole={role} />
@@ -273,7 +295,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
                   level="body-sm" 
                   textColor="text.tertiary" 
                   textAlign="center"
-                  sx={{ py: 1.5 }}
+                  sx={{ py: 1 }}
                 >
                   Drag mentors here
                 </Typography>

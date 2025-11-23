@@ -1,0 +1,54 @@
+import { Divider, Grid, Typography } from "@mui/joy";
+import { StudentItem } from "@/components/StudentItem";
+import { MentorItem } from "@/components/MentorItem";
+import Student from "@/types/Student";
+import Mentor from "@/types/Mentor";
+
+interface PeopleSidebarProps {
+  students: Student[];
+  mentors: Mentor[];
+}
+
+export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
+  return (
+    <aside
+      className="bg-white rounded-l-lg rounded-r-none shadow-md px-3 py-2 flex flex-col h-full"
+      style={{
+        width: "18rem",
+        flexShrink: 0,
+        minHeight: 0,
+      }}
+    >
+      <div style={{ overflowY: "auto", paddingRight: "0.25rem", flex: 1, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <section>
+          <Divider sx={{ mb: 1 }}>
+            <Typography level="title-lg" sx={{ color: "primary.600" }}>
+              Students ({students.length})
+            </Typography>
+          </Divider>
+          <Grid container spacing={0.5}>
+            {students.map((student) => (
+              <Grid xs={12} key={student.name}>
+                <StudentItem student={student} />
+              </Grid>
+            ))}
+          </Grid>
+        </section>
+        <section>
+          <Divider sx={{ mb: 1 }}>
+            <Typography level="title-lg" sx={{ color: "warning.600" }}>
+              Mentors ({mentors.length})
+            </Typography>
+          </Divider>
+          <Grid container spacing={0.5}>
+            {mentors.map((mentor) => (
+              <Grid xs={12} key={mentor.name}>
+                <MentorItem mentor={mentor} />
+              </Grid>
+            ))}
+          </Grid>
+        </section>
+      </div>
+    </aside>
+  );
+};

@@ -1,49 +1,52 @@
 "use client";
 
-import { AppProvider } from "@/AppContext";
-import MainComponent from "@/components/MainComponent";
-import { Typography } from "@mui/joy";
-
-import Image from "next/image";
+import { useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { Typography, Button } from "@mui/joy";
+import { useAppState } from "@/AppContext";
+import { EditConfigModal } from "@/components/EditConfigModal";
+import { RolesGrid } from "@/components/RolesGrid";
+import { PeopleSidebar } from "@/components/PeopleSidebar";
 
 const HomePage = () => {
+  const { state } = useAppState();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const students = state.students;
+  const mentors = state.mentors;
+  const roles = state.roles;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <AppProvider>
-        <div className="container mx-auto pl-3 pr-0 py-6 max-w-[1600px]">
-          <div className="flex items-center justify-center gap-4 mb-3">
-            <Image 
-              src="/voc.png" 
-              alt="VOC Logo" 
-              width={120} 
-              height={120}
-              className="h-auto opacity-80"
-              style={{ maxHeight: '6rem' }}
-            />
-            <Typography 
-              level="h1" 
-              textAlign="center"
-              sx={{ 
-                fontSize: { xs: '1.75rem', md: '2.5rem' },
-                fontWeight: 700,
-                color: 'primary.600'
-              }}
-            >
-              Final Project Assignments
+    <DndProvider backend={HTML5Backend}>
+      <div className="w-full min-h-[calc(100vh-5rem)] bg-gradient-to-br from-slate-50 to-blue-50 p-6 flex flex-col">
+        <main
+          className="w-full flex flex-col flex-1"
+          style={{ minHeight: "calc(100vh - 10rem)" }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <Typography level="title-md" sx={{ fontWeight: 600 }}>
+              Assignments Overview
             </Typography>
-            <Image 
-              src="/cairn.png" 
-              alt="Cairn Logo" 
-              width={120} 
-              height={120}
-              className="h-auto opacity-80"
-              style={{ maxHeight: '6rem' }}
-            />
+            <Button
+              variant="outlined"
+              size="sm"
+              color="neutral"
+              onClick={() => setEditModalOpen(true)}
+            >
+              Edit Config
+            </Button>
           </div>
-          <MainComponent />
-        </div>
-      </AppProvider>
-    </div>
+
+          <div className="flex flex-1 gap-3 min-h-0 items-stretch">
+            <RolesGrid roles={roles} />
+            <PeopleSidebar students={students} mentors={mentors} />
+          </div>
+        </main>
+
+        <EditConfigModal open={editModalOpen} onClose={() => setEditModalOpen(false)} />
+      </div>
+    </DndProvider>
   );
 };
 
