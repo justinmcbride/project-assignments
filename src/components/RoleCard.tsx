@@ -147,8 +147,14 @@ export const RoleCard: FC<Props> = ({ role }) => {
           background: (isActive || isAlreadyInRole)
             ? (isAlreadyInRole || wouldExceedLimit
                 ? 'linear-gradient(135deg, rgba(211, 47, 47, 0.12) 0%, rgba(211, 47, 47, 0.04) 50%, transparent 100%)'
-                : 'linear-gradient(135deg, rgba(25, 135, 84, 0.15) 0%, rgba(25, 135, 84, 0.05) 50%, transparent 100%)')
-            : 'linear-gradient(to bottom right, #ffffff 40%, #f9f9f9 100%)',
+                : 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%)')
+            : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(8px)',
+          boxShadow: (isActive || isAlreadyInRole) ? 'md' : 'sm',
+          '&:hover': {
+            boxShadow: 'md',
+            borderColor: (isActive || isAlreadyInRole) ? undefined : 'primary.200',
+          }
         }}
       >
         {/* Normal Content - Always rendered to maintain size, but hidden if active */}

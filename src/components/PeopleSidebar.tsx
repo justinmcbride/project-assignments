@@ -12,7 +12,7 @@ interface PeopleSidebarProps {
 export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
   return (
     <aside
-      className="bg-white rounded-l-lg rounded-r-none shadow-md px-3 py-2 flex flex-col h-full"
+      className="bg-white/80 backdrop-blur-md border-l border-gray-200 p-4 flex flex-col h-full overflow-hidden shadow-sm"
       style={{
         width: "100%",
         flexShrink: 0,
