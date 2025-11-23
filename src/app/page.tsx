@@ -38,7 +38,7 @@ const HomePage = () => {
             </Button>
           </div>
 
-          <div className="flex flex-1 gap-3 min-h-0 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 flex-1 min-h-0">
             <RolesGrid roles={roles} />
             <PeopleSidebar students={students} mentors={mentors} />
           </div>

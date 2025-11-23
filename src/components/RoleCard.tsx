@@ -18,8 +18,8 @@ import { StudentItem } from "./StudentItem";
 import { MentorItem } from "./MentorItem";
 import { useAppState } from "@/AppContext";
 
-export const ROLE_CARD_MIN_WIDTH = 240;
-export const ROLE_CARD_MIN_HEIGHT = 280;
+export const ROLE_CARD_MIN_WIDTH = 300;
+export const ROLE_CARD_MIN_HEIGHT = 200;
 
 interface Props {
   role: Role;
@@ -33,6 +33,8 @@ export const RoleCard: FC<Props> = ({ role }) => {
     students: studentNames,
     mentors: mentorNames,
   } = role;
+  
+
 
   const { state } = useAppState();
 
@@ -133,6 +135,11 @@ export const RoleCard: FC<Props> = ({ role }) => {
           flexDirection: "column",
           transition: 'all 0.2s ease-in-out',
           border: (isActive || isAlreadyInRole) ? '3px solid' : undefined,
+          borderLeft: (isActive || isAlreadyInRole) ? undefined : '4px solid',
+          borderLeftColor: (isActive || isAlreadyInRole) ? undefined : (
+             assignmentColor === 'success' ? 'success.500' : 
+             assignmentColor === 'danger' ? 'danger.500' : 'neutral.300'
+          ),
           borderColor: (isActive || isAlreadyInRole)
             ? (isAlreadyInRole || wouldExceedLimit ? 'danger.400' : 'success.500')
             : undefined,
@@ -140,7 +147,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
             ? (isAlreadyInRole || wouldExceedLimit
                 ? 'linear-gradient(135deg, rgba(211, 47, 47, 0.12) 0%, rgba(211, 47, 47, 0.04) 50%, transparent 100%)'
                 : 'linear-gradient(135deg, rgba(25, 135, 84, 0.15) 0%, rgba(25, 135, 84, 0.05) 50%, transparent 100%)')
-            : undefined,
+            : 'linear-gradient(to bottom right, #ffffff 40%, #f9f9f9 100%)',
           '&:hover': {
             boxShadow: 'md',
             transform: (isActive || isAlreadyInRole) ? 'scale(1.02)' : 'translateY(-2px)'
@@ -205,44 +212,55 @@ export const RoleCard: FC<Props> = ({ role }) => {
           ) : null}
         </CardContent>
       ) : (
-        <CardContent sx={{ p: 1.5, flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: 'hidden' }}>
+        <CardContent sx={{ p: 0.5, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <Typography 
+              level="title-md" 
+              sx={{ 
+                fontWeight: 700,
+                lineHeight: 1.2
+              }}
+            >
+              {name}
+            </Typography>
+          </div>
+          
           <Typography 
-            level="h4" 
-            sx={{ 
-              fontSize: '1rem',
-              fontWeight: 600,
-              mb: 1
-            }}
-          >
-            {name}
-          </Typography>
-          <Divider sx={{ my: 1 }} />
-          <Typography 
-            level="body-sm" 
+            level="body-xs" 
             sx={{ 
               mb: 1,
               color: 'text.secondary',
-              minHeight: '2.5rem',
-              fontSize: '0.875rem',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical'
+              fontSize: '0.75rem',
+              lineHeight: 1.4,
             }}
           >
             {description}
           </Typography>
-          <Divider sx={{ my: 1 }}>
-            <Typography level="body-xs" fontWeight="lg">Students</Typography>
-          </Divider>
+
+          {/* Students Section */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+            <Typography level="body-xs" fontWeight="lg" sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
+              Students
+            </Typography>
+            <Typography 
+              level="body-xs" 
+              fontWeight="md"
+              sx={{ 
+                fontSize: '0.7rem',
+                color: assignmentColor === 'danger' ? 'danger.600' : assignmentColor === 'success' ? 'success.600' : 'text.secondary',
+              }}
+            >
+              {students.length}/{desiredStudents}
+            </Typography>
+          </div>
+          
           <Grid
             container
             spacing={0.5}
             sx={{
-              minHeight: '48px',
-              flex: 1,
-              overflow: 'auto',
+              mt: 0.5,
+              mb: 1,
+              minHeight: '32px',
               width: '100%',
               maxWidth: '100%',
               alignContent: 'flex-start',
@@ -258,27 +276,39 @@ export const RoleCard: FC<Props> = ({ role }) => {
             ))}
             {students.length === 0 && (
               <Grid xs={12}>
-                <Typography 
-                  level="body-sm" 
-                  textColor="text.tertiary" 
-                  textAlign="center"
-                  sx={{ py: 1 }}
-                >
-                  Drag students here
-                </Typography>
+                <div style={{ 
+                  border: '1px dashed', 
+                  borderColor: 'var(--joy-palette-neutral-300)', 
+                  borderRadius: '4px', 
+                  padding: '4px', 
+                  textAlign: 'center' 
+                }}>
+                  <Typography level="body-xs" textColor="text.tertiary">
+                    Drop students
+                  </Typography>
+                </div>
               </Grid>
             )}
           </Grid>
-          <Divider sx={{ my: 1 }}>
-            <Typography level="body-xs" fontWeight="lg">Mentors</Typography>
-          </Divider>
+
+          {/* Mentors Section */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography level="body-xs" fontWeight="lg" sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
+              Mentors
+            </Typography>
+            {mentors.length > 0 && (
+              <Typography level="body-xs" fontWeight="md" sx={{ fontSize: '0.7rem', color: 'primary.600' }}>
+                {mentors.length}
+              </Typography>
+            )}
+          </div>
+
           <Grid
             container
             spacing={0.5}
             sx={{
-              minHeight: '48px',
-              flex: 1,
-              overflow: 'auto',
+              mt: 0.5,
+              minHeight: '32px',
               width: '100%',
               maxWidth: '100%',
               alignContent: 'flex-start',
@@ -291,48 +321,22 @@ export const RoleCard: FC<Props> = ({ role }) => {
             ))}
             {mentors.length === 0 && (
               <Grid xs={12}>
-                <Typography 
-                  level="body-sm" 
-                  textColor="text.tertiary" 
-                  textAlign="center"
-                  sx={{ py: 1 }}
-                >
-                  Drag mentors here
-                </Typography>
+                <div style={{ 
+                  border: '1px dashed', 
+                  borderColor: 'var(--joy-palette-neutral-300)', 
+                  borderRadius: '4px', 
+                  padding: '4px', 
+                  textAlign: 'center' 
+                }}>
+                  <Typography level="body-xs" textColor="text.tertiary">
+                    Drop mentors
+                  </Typography>
+                </div>
               </Grid>
             )}
           </Grid>
         </CardContent>
       )}
-      <CardOverflow 
-        variant="soft" 
-        sx={{ 
-          bgcolor: assignmentColor === 'danger' ? 'danger.softBg' : assignmentColor === 'success' ? 'success.softBg' : 'background.level1',
-          borderTop: assignmentColor === 'danger' ? '2px solid' : '1px solid',
-          borderColor: assignmentColor === 'danger' ? 'danger.500' : 'divider'
-        }}
-      >
-        <Divider inset="context" />
-        <CardContent orientation="horizontal" sx={{ py: 0.75, justifyContent: 'space-between', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-          <Typography
-            level="body-xs"
-            fontWeight="md"
-            sx={{ 
-              color: assignmentColor === 'danger' ? 'danger.600' : assignmentColor === 'success' ? 'success.600' : 'text.secondary',
-              fontWeight: assignmentColor === 'danger' ? 'bold' : 'md'
-            }}
-          >
-            {students.length} / {desiredStudents} student{desiredStudents !== 1 ? 's' : ''}
-          </Typography>
-          <Typography
-            level="body-xs"
-            fontWeight="md"
-            sx={{ color: mentors.length > 0 ? 'primary.600' : 'text.tertiary' }}
-          >
-            {mentors.length} mentor{mentors.length !== 1 ? 's' : ''}
-          </Typography>
-        </CardContent>
-      </CardOverflow>
     </Card>
     </div>
   );

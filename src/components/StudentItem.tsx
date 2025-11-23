@@ -68,7 +68,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
       style={{ display: "inline-block" }}
     >
       <Chip
-        size="md"
+        size="sm"
         variant={student.roles.length === 0 ? "outlined" : "solid"}
         color={
           student.roles.length === 0

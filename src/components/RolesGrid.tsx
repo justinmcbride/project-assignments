@@ -12,10 +12,11 @@ export const RolesGrid = ({ roles }: RolesGridProps) => {
         style={{
           flex: 1,
           display: "grid",
-          gridTemplateColumns: `repeat(4, minmax(${ROLE_CARD_MIN_WIDTH}px, 1fr))`,
-          gridTemplateRows: `repeat(2, minmax(${ROLE_CARD_MIN_HEIGHT}px, 1fr))`,
+          gridTemplateColumns: `repeat(auto-fit, minmax(${ROLE_CARD_MIN_WIDTH}px, 1fr))`,
           gap: "1rem",
           minHeight: 0,
+          overflowY: "auto",
+          paddingBottom: "1rem", // Add some padding at the bottom for scrolling
         }}
       >
         {roles.map((role) => (

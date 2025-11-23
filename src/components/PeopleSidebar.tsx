@@ -14,7 +14,7 @@ export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
     <aside
       className="bg-white rounded-l-lg rounded-r-none shadow-md px-3 py-2 flex flex-col h-full"
       style={{
-        width: "18rem",
+        width: "100%",
         flexShrink: 0,
         minHeight: 0,
       }}

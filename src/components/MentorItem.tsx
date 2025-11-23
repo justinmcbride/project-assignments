@@ -82,7 +82,7 @@ export const MentorItem: FC<Props> = ({ mentor, parentRole }) => {
       style={{ display: "inline-block" }}
     >
       <Chip
-        size="md"
+        size="sm"
         variant={chipVariant}
         color={chipColor}
         endDecorator={
