@@ -21,13 +21,6 @@ export const RolesGrid = ({ roles }: RolesGridProps) => {
           gridAutoFlow: "dense",
         }}
       >
-        <style jsx>{`
-          @media (min-width: 1800px) {
-            div {
-              grid-template-columns: repeat(5, 1fr) !important;
-            }
-          }
-        `}</style>
         {roles.map((role) => (
           <div
             key={role.name}
