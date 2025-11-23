@@ -90,6 +90,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
       style={{
         display: "inline-block",
         position: "relative",
+        zIndex: 1,
       }}
     >
       <div

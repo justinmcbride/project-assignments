@@ -90,6 +90,7 @@ export const MentorItem: FC<Props> = ({ mentor, parentRole }) => {
       style={{
         display: "inline-block",
         position: "relative",
+        zIndex: 1,
       }}
     >
       <div

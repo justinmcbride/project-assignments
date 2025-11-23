@@ -134,7 +134,6 @@ export const RoleCard: FC<Props> = ({ role }) => {
           flexShrink: 0,
           display: "flex",
           flexDirection: "column",
-          transition: 'all 0.2s ease-in-out',
           position: 'relative', // Ensure relative positioning for absolute overlay
           border: (isActive || isAlreadyInRole) ? '3px solid' : undefined,
           borderLeft: (isActive || isAlreadyInRole) ? undefined : '4px solid',
@@ -165,7 +164,9 @@ export const RoleCard: FC<Props> = ({ role }) => {
           display: "flex", 
           flexDirection: "column", 
           minWidth: 0,
-          visibility: (isActive || isAlreadyInRole) ? 'hidden' : 'visible' 
+          visibility: (isActive || isAlreadyInRole) ? 'hidden' : 'visible',
+          position: 'relative',
+          zIndex: 1
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
             <Typography 
