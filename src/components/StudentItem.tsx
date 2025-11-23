@@ -68,7 +68,7 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
       style={{ display: "inline-block" }}
     >
       <Chip
-        size="sm"
+        size="md"
         variant={student.roles.length === 0 ? "outlined" : "solid"}
         color={
           student.roles.length === 0
@@ -83,7 +83,6 @@ export const StudentItem: FC<Props> = ({ student, parentRole }) => {
         sx={{
           cursor: "grab",
           transition: "all 0.2s ease-in-out",
-          "&:hover": { transform: "scale(1.05)", boxShadow: "sm" },
           "&:active": { cursor: "grabbing" },
         }}
       >

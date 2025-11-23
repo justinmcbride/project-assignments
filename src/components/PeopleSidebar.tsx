@@ -28,7 +28,7 @@ export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
           </Divider>
           <Grid container spacing={0.5}>
             {students.map((student) => (
-              <Grid xs={12} key={student.name}>
+              <Grid xs={6} key={student.name}>
                 <StudentItem student={student} />
               </Grid>
             ))}
@@ -42,7 +42,7 @@ export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
           </Divider>
           <Grid container spacing={0.5}>
             {mentors.map((mentor) => (
-              <Grid xs={12} key={mentor.name}>
+              <Grid xs={6} key={mentor.name}>
                 <MentorItem mentor={mentor} />
               </Grid>
             ))}

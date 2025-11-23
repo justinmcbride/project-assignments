@@ -134,6 +134,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
           display: "flex",
           flexDirection: "column",
           transition: 'all 0.2s ease-in-out',
+          position: 'relative', // Ensure relative positioning for absolute overlay
           border: (isActive || isAlreadyInRole) ? '3px solid' : undefined,
           borderLeft: (isActive || isAlreadyInRole) ? undefined : '4px solid',
           borderLeftColor: (isActive || isAlreadyInRole) ? undefined : (
@@ -148,71 +149,17 @@ export const RoleCard: FC<Props> = ({ role }) => {
                 ? 'linear-gradient(135deg, rgba(211, 47, 47, 0.12) 0%, rgba(211, 47, 47, 0.04) 50%, transparent 100%)'
                 : 'linear-gradient(135deg, rgba(25, 135, 84, 0.15) 0%, rgba(25, 135, 84, 0.05) 50%, transparent 100%)')
             : 'linear-gradient(to bottom right, #ffffff 40%, #f9f9f9 100%)',
-          '&:hover': {
-            boxShadow: 'md',
-            transform: (isActive || isAlreadyInRole) ? 'scale(1.02)' : 'translateY(-2px)'
-          }
         }}
       >
-      {(isActive || isAlreadyInRole) ? (
-        // Simplified hover view showing role title and count
+        {/* Normal Content - Always rendered to maintain size, but hidden if active */}
         <CardContent sx={{ 
-          p: 3, 
+          p: 0.5, 
           flex: 1, 
           display: "flex", 
           flexDirection: "column", 
-          alignItems: "center", 
-          justifyContent: "center",
-          textAlign: "center",
-          gap: 2
+          minWidth: 0,
+          visibility: (isActive || isAlreadyInRole) ? 'hidden' : 'visible' 
         }}>
-          <Typography 
-            level="h2" 
-            sx={{ 
-              fontSize: '2rem',
-              fontWeight: 700,
-              color: (isAlreadyInRole || wouldExceedLimit) ? 'danger.700' : 'success.700',
-              mb: 1
-            }}
-          >
-            {name}
-          </Typography>
-          {isAlreadyInRole ? (
-            <>
-              <Typography 
-                level="h3" 
-                sx={{ 
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  color: 'danger.600',
-                }}
-              >
-                {draggedName}
-              </Typography>
-              <Typography 
-                level="body-md" 
-                sx={{ 
-                  color: 'danger.500',
-                  fontWeight: 500
-                }}
-              >
-                ⚠ Already in this role
-              </Typography>
-            </>
-          ) : wouldExceedLimit ? (
-            <Typography 
-              level="body-md" 
-              sx={{ 
-                color: 'danger.500',
-                fontWeight: 500
-              }}
-            >
-              ⚠ Over limit
-            </Typography>
-          ) : null}
-        </CardContent>
-      ) : (
-        <CardContent sx={{ p: 0.5, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
             <Typography 
               level="title-md" 
@@ -336,7 +283,67 @@ export const RoleCard: FC<Props> = ({ role }) => {
             )}
           </Grid>
         </CardContent>
-      )}
+
+        {/* Hover Overlay - Absolute positioned */}
+        {(isActive || isAlreadyInRole) && (
+          <CardContent sx={{ 
+            position: 'absolute',
+            inset: 0,
+            p: 3, 
+            display: "flex", 
+            flexDirection: "column", 
+            alignItems: "center", 
+            justifyContent: "center",
+            textAlign: "center",
+            gap: 2,
+            zIndex: 10
+          }}>
+            <Typography 
+              level="h2" 
+              sx={{ 
+                fontSize: '2rem',
+                fontWeight: 700,
+                color: (isAlreadyInRole || wouldExceedLimit) ? 'danger.700' : 'success.700',
+                mb: 1
+              }}
+            >
+              {name}
+            </Typography>
+            {isAlreadyInRole ? (
+              <>
+                <Typography 
+                  level="h3" 
+                  sx={{ 
+                    fontSize: '1.5rem',
+                    fontWeight: 600,
+                    color: 'danger.600',
+                  }}
+                >
+                  {draggedName}
+                </Typography>
+                <Typography 
+                  level="body-md" 
+                  sx={{ 
+                    color: 'danger.500',
+                    fontWeight: 500
+                  }}
+                >
+                  ⚠ Already in this role
+                </Typography>
+              </>
+            ) : wouldExceedLimit ? (
+              <Typography 
+                level="body-md" 
+                sx={{ 
+                  color: 'danger.500',
+                  fontWeight: 500
+                }}
+              >
+                ⚠ Over limit
+              </Typography>
+            ) : null}
+          </CardContent>
+        )}
     </Card>
     </div>
   );
