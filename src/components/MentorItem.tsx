@@ -1,6 +1,7 @@
 import { FC, useCallback } from "react";
 import { useDrag } from "react-dnd";
-import { Chip, ChipDelete, Avatar } from "@mui/joy";
+import { IconButton } from "@mui/joy";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { ItemTypes } from "./ItemTypes";
 import Mentor from "@/types/Mentor";
@@ -58,49 +59,94 @@ export const MentorItem: FC<Props> = ({ mentor, parentRole }) => {
   }));
 
   const rolesCountText =
-    mentor.roles.length > 1 ? ` (in ${mentor.roles.length} roles)` : "";
+    mentor.roles.length > 1 ? ` (${mentor.roles.length})` : "";
 
   const isUnassigned = mentor.roles.length === 0;
   const isInMultipleRoles = mentor.roles.length > 1;
 
-  const chipVariant = isUnassigned
-    ? "outlined"
+  const backgroundColor = isUnassigned
+    ? "rgba(139, 92, 246, 0.12)"
     : isInMultipleRoles
-      ? "soft"
-      : "solid";
-  const chipColor = isUnassigned
-    ? "primary"
+      ? "rgba(251, 146, 60, 0.12)"
+      : "rgba(34, 197, 94, 0.12)";
+
+  const borderColor = isUnassigned
+    ? "#a78bfa"
     : isInMultipleRoles
-      ? "warning"
-      : "success";
+      ? "#fb923c"
+      : "#4ade80";
+
+  const textColor = isUnassigned
+    ? "#7c3aed"
+    : isInMultipleRoles
+      ? "#ea580c"
+      : "#16a34a";
 
   return (
     <div
       ref={(node) => {
         drag(node);
       }}
-      style={{ display: "inline-block" }}
+      style={{
+        display: "inline-block",
+        position: "relative",
+      }}
     >
-      <Chip
-        size="md"
-        variant={chipVariant}
-        color={chipColor}
-        startDecorator={
-          <Avatar size="sm" src={`https://api.dicebear.com/7.x/initials/svg?seed=${mentor.name}&chars=1`} />
-        }
-        endDecorator={
-          parentRole ? <ChipDelete onDelete={handleRemoveFromRole} /> : null
-        }
-        sx={{
+      <div
+        style={{
+          padding: "6px 12px",
+          paddingRight: parentRole ? "32px" : "12px",
+          borderRadius: "8px",
+          background: backgroundColor,
+          border: `1.5px solid ${borderColor}`,
           cursor: "grab",
           transition: "all 0.2s ease-in-out",
-          "&:active": { cursor: "grabbing" },
-          "--Chip-radius": "20px",
+          position: "relative",
+          fontSize: "0.875rem",
+          fontWeight: 500,
+          color: textColor,
+          userSelect: "none",
+        }}
+        onMouseDown={(e) => {
+          (e.currentTarget as HTMLElement).style.cursor = "grabbing";
+        }}
+        onMouseUp={(e) => {
+          (e.currentTarget as HTMLElement).style.cursor = "grab";
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+          (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+          (e.currentTarget as HTMLElement).style.boxShadow = "none";
         }}
       >
         {mentor.name}
-        {rolesCountText}
-      </Chip>
+        <span style={{ opacity: 0.7, fontSize: "0.75rem" }}>{rolesCountText}</span>
+        {parentRole && (
+          <IconButton
+            size="sm"
+            variant="plain"
+            color="neutral"
+            onClick={handleRemoveFromRole}
+            sx={{
+              position: "absolute",
+              right: "2px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              minWidth: "24px",
+              minHeight: "24px",
+              "--IconButton-size": "24px",
+              "&:hover": {
+                bgcolor: "rgba(0,0,0,0.08)",
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: "14px" }} />
+          </IconButton>
+        )}
+      </div>
     </div>
   );
 };

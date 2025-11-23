@@ -8,6 +8,16 @@ const theme = extendTheme({
     body: "var(--font-inter)",
     display: "var(--font-outfit)",
   },
+  fontSize: {
+    xs: "0.8125rem",
+    sm: "0.9375rem",
+    md: "1.0625rem",
+    lg: "1.1875rem",
+    xl: "1.3125rem",
+    xl2: "1.5rem",
+    xl3: "1.8125rem",
+    xl4: "2.25rem",
+  },
   colorSchemes: {
     light: {
       palette: {

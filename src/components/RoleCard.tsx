@@ -149,11 +149,11 @@ export const RoleCard: FC<Props> = ({ role }) => {
             ? (isAlreadyInRole || wouldExceedLimit
                 ? 'linear-gradient(135deg, rgba(211, 47, 47, 0.12) 0%, rgba(211, 47, 47, 0.04) 50%, transparent 100%)'
                 : 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%)')
-            : 'linear-gradient(135deg, rgba(224, 231, 255, 0.6) 0%, rgba(238, 242, 255, 0.4) 100%)',
-          backdropFilter: 'blur(8px)',
-          boxShadow: (isActive || isAlreadyInRole) ? 'md' : 'sm',
+            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: (isActive || isAlreadyInRole) ? 'lg' : '0 2px 8px rgba(0, 0, 0, 0.08)',
           '&:hover': {
-            boxShadow: 'md',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
             borderColor: (isActive || isAlreadyInRole) ? undefined : 'primary.200',
           }
         }}
@@ -169,7 +169,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
             <Typography 
-              level="title-md" 
+              level="title-lg" 
               sx={{ 
                 fontWeight: 700,
                 lineHeight: 1.2
@@ -180,11 +180,10 @@ export const RoleCard: FC<Props> = ({ role }) => {
           </div>
           
           <Typography 
-            level="body-xs" 
+            level="body-sm" 
             sx={{ 
               mb: 1,
               color: 'text.secondary',
-              fontSize: '0.75rem',
               lineHeight: 1.4,
             }}
           >
@@ -194,14 +193,13 @@ export const RoleCard: FC<Props> = ({ role }) => {
           {/* Students Section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography level="body-xs" fontWeight="lg" sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
+              <Typography level="body-sm" fontWeight="lg" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
                 Students
               </Typography>
               <Typography 
-                level="body-xs" 
+                level="body-sm" 
                 fontWeight="md"
                 sx={{ 
-                  fontSize: '0.7rem',
                   color: assignmentColor === 'danger' ? 'danger.600' : assignmentColor === 'success' ? 'success.600' : 'text.secondary',
                 }}
               >
@@ -248,7 +246,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
                   padding: '4px', 
                   textAlign: 'center' 
                 }}>
-                  <Typography level="body-xs" textColor="text.tertiary">
+                  <Typography level="body-sm" textColor="text.tertiary">
                     Drop students
                   </Typography>
                 </div>
@@ -258,11 +256,11 @@ export const RoleCard: FC<Props> = ({ role }) => {
 
           {/* Mentors Section */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography level="body-xs" fontWeight="lg" sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
+            <Typography level="body-sm" fontWeight="lg" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.tertiary' }}>
               Mentors
             </Typography>
             {mentors.length > 0 && (
-              <Typography level="body-xs" fontWeight="md" sx={{ fontSize: '0.7rem', color: 'primary.600' }}>
+              <Typography level="body-sm" fontWeight="md" sx={{ color: 'primary.600' }}>
                 {mentors.length}
               </Typography>
             )}
@@ -293,7 +291,7 @@ export const RoleCard: FC<Props> = ({ role }) => {
                   padding: '4px', 
                   textAlign: 'center' 
                 }}>
-                  <Typography level="body-xs" textColor="text.tertiary">
+                  <Typography level="body-sm" textColor="text.tertiary">
                     Drop mentors
                   </Typography>
                 </div>
