@@ -1,3 +1,5 @@
+"use client";
+
 import { Typography } from "@mui/joy";
 import Image from "next/image";
 import { ConfigButton } from "@/components/ConfigButton";
