@@ -20,15 +20,16 @@ export const PeopleSidebar = ({ students, mentors }: PeopleSidebarProps) => {
 
   return (
     <aside
-      className="p-4 flex flex-col h-full overflow-hidden"
+      className="p-4 flex flex-col sticky top-4"
       style={{
         width: "100%",
         flexShrink: 0,
-        minHeight: 0,
         backdropFilter: "blur(10px)",
+        maxHeight: "calc(100vh - 2rem)",
+        overflowY: "auto",
       }}
     >
-      <div style={{ overflowY: "auto", paddingRight: "0.25rem", flex: 1, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <div style={{ paddingRight: "0.25rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <section>
           <Divider sx={{ mb: 1 }}>
             <Typography level="title-lg" sx={{ color: "primary.600" }}>

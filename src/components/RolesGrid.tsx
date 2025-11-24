@@ -7,15 +7,12 @@ interface RolesGridProps {
 
 export const RolesGrid = ({ roles }: RolesGridProps) => {
   return (
-    <section className="flex-1 min-w-0 flex flex-col min-h-0">
+    <section className="flex-1 min-w-0 flex flex-col">
       <div
         style={{
-          flex: 1,
           display: "grid",
           gridTemplateColumns: `repeat(auto-fit, minmax(${ROLE_CARD_MIN_WIDTH}px, 1fr))`,
           gap: "1rem",
-          minHeight: 0,
-          overflowY: "auto",
           paddingBottom: "1rem",
           maxWidth: "100%",
           gridAutoFlow: "dense",
