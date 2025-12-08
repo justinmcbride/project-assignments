@@ -18,7 +18,7 @@
     "@mui/icons-material": "^7.3.5",
     "@mui/joy": "^5.0.0-beta.48",
     "eslint-plugin-unused-imports": "^4.1.4",
-    "next": "^16.0.1",
+    "next": "16.0.7",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "react": "^18.3.1",
